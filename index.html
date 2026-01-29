@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Café Bar 31">
+    <meta name="description" content="Commandez vos Smash Burgers à Delémont">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <title>Café Bar le 31 - Smash Burgers</title>
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-72x72.png">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="manifest" href="manifest.json">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html { height: 100%; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; 
+            background: #ffffff; 
+            padding-bottom: 100px; 
+            min-height: 100%;
+            overscroll-behavior-y: none;
+            color: #000000;
+        }
+
+        .header { 
+            background: #000000; 
+            color: #ffffff; 
+            padding: 20px; 
+            text-align: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            border-bottom: 3px solid #000000; 
+        }
+        .header img { 
+            width: 120px; 
+            height: 120px; 
+            background: #ffffff; 
+            border-radius: 50%; 
+            margin-bottom: 10px; 
+            padding: 5px; 
+            border: 3px solid #ffffff; 
+            object-fit: cover; 
+        }
+        .badges { margin-top: 10px; }
+        .badge { 
+            display: inline-block; 
+            background: #ffffff; 
+            color: #000000; 
+            padding: 5px 12px; 
+            border-radius: 15px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            margin: 2px; 
+            border: 2px solid #000000;
+        }
+
+        .nav { 
+            display: flex; 
+            overflow-x: auto; 
+            gap: 10px; 
+            padding: 15px; 
+            background: #ffffff; 
+            position: sticky; 
+            top: 200px; 
+            z-index: 99; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            scrollbar-width: none; 
+            border-bottom: 2px solid #000000;
+        }
+        .nav::-webkit-scrollbar { display: none; }
+        .nav button { 
+            flex-shrink: 0; 
+            padding: 12px 20px; 
+            border: 2px solid #000000; 
+            background: #ffffff; 
+            color: #000000; 
+            border-radius: 25px; 
+            font-weight: bold; 
+            font-size: 14px; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+        }
+        .nav button:hover, .nav button.active { 
+            background: #000000; 
+            color: #ffffff; 
+        }
+
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .category { display: none; animation: fadeIn 0.3s; }
+        .category.active { display: block; }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        h2 { color: #000000; margin: 20px 0 15px 0; padding-bottom: 10px; border-bottom: 3px solid #000000; }
+
+        .item { 
+            background: #ffffff; 
+            border-radius: 12px; 
+            padding: 15px; 
+            margin-bottom: 12px; 
+            border: 2px solid #000000; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
+        }
+        .item h3 { color: #000000; margin-bottom: 5px; font-size: 16px; font-weight: bold; }
+        .item p { color: #333333; font-size: 13px; margin-bottom: 8px; }
+        .item .price { color: #000000; font-weight: bold; font-size: 18px; }
+
+        .qty-control { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .qty-control button { 
+            width: 35px; 
+            height: 35px; 
+            border-radius: 50%; 
+            border: 2px solid #000000; 
+            background: #000000; 
+            color: #ffffff; 
+            font-size: 18px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+        }
+        .qty-control button:hover:not(:disabled) { background: #333333; transform: scale(1.1); }
+        .qty-control button:disabled { background: #cccccc; border-color: #cccccc; cursor: not-allowed; }
+        .qty-control span { font-weight: bold; min-width: 30px; text-align: center; font-size: 16px; color: #000000; }
+
+        .cart { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: #ffffff; 
+            padding: 15px 20px; 
+            border-top: 3px solid #000000; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            z-index: 1000; 
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); 
+        }
+        .cart button { 
+            background: #000000; 
+            color: #ffffff; 
+            border: 2px solid #000000; 
+            padding: 15px 25px; 
+            border-radius: 25px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 16px; 
+            transition: all 0.2s; 
+        }
+        .cart button:hover:not(:disabled) { background: #333333; transform: scale(1.05); }
+        .cart button:disabled { background: #cccccc; border-color: #cccccc; cursor: not-allowed; }
+
+        #orderModal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background: rgba(0,0,0,0.6); 
+            z-index: 2000; 
+            align-items: flex-end; 
+            justify-content: center; 
+        }
+        #orderModal.show { display: flex; }
+        .modal-content { 
+            background: #ffffff; 
+            width: 100%; 
+            max-width: 500px; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+            border-radius: 20px 20px 0 0; 
+            padding: 25px; 
+            border-top: 3px solid #000000;
+        }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 5px; 
+            font-weight: bold; 
+            color: #000000; 
+            font-size: 14px; 
+        }
+        input, textarea, select { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #000000; 
+            border-radius: 10px; 
+            font-size: 15px; 
+            font-family: inherit; 
+            -webkit-appearance: none;
+            background: #ffffff;
+            color: #000000;
+        }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: #000000; background: #f5f5f5; }
+
+        .checkbox-group { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            margin: 10px 0; 
+        }
+        .checkbox-option { 
+            display: flex; 
+            align-items: center; 
+            padding: 12px; 
+            border: 2px solid #000000; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: all 0.2s;
+            background: #ffffff;
+        }
+        .checkbox-option:hover { background: #f5f5f5; }
+        .checkbox-option.selected { 
+            background: #000000; 
+            color: #ffffff;
+        }
+        .checkbox-option.selected .price { color: #ffffff; }
+        .checkbox-option input[type="checkbox"] { 
+            width: 20px; 
+            height: 20px; 
+            margin-right: 10px; 
+            cursor: pointer;
+            accent-color: #000000;
+        }
+        .checkbox-option label { 
+            display: flex; 
+            justify-content: space-between; 
+            width: 100%; 
+            cursor: pointer;
+            margin: 0;
+            color: inherit;
+        }
+        .checkbox-option .price { color: #000000; font-weight: bold; }
+
+        .radio-group { display: flex; gap: 15px; margin: 15px 0; }
+        .radio-option { 
+            flex: 1; 
+            padding: 15px; 
+            border: 2px solid #000000; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            text-align: center; 
+            transition: all 0.2s; 
+            background: #ffffff;
+        }
+        .radio-option:hover { background: #f5f5f5; }
+        .radio-option.selected { 
+            background: #000000; 
+            color: #ffffff;
+        }
+        .radio-option label { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            font-weight: normal; 
+            color: inherit;
+        }
+        .radio-option input { width: auto; margin-right: 8px; cursor: pointer; }
+
+        .datetime-row { display: flex; gap: 10px; }
+        .datetime-row > div { flex: 1; }
+
+        .btn-primary { 
+            width: 100%; 
+            background: #000000; 
+            color: #ffffff; 
+            border: 2px solid #000000; 
+            padding: 16px; 
+            border-radius: 25px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            margin-top: 10px; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+        }
+        .btn-primary:hover { background: #333333; transform: scale(1.02); }
+        .hidden { display: none !important; }
+        
+        .install-prompt {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000000;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            animation: slideUp 0.3s ease;
+            border: 2px solid #000000;
+        }
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100%); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+        .install-prompt button {
+            background: #ffffff;
+            color: #000000;
+            border: 2px solid #000000;
+            padding: 8px 16px;
+            border-radius: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .info-box {
+            background: #ffffff;
+            border: 2px solid #000000;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #000000;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            color: #000000;
+            font-size: 14px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #000000;
+            padding-bottom: 5px;
+        }
+        
+        .frites-options {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            border: 1px solid #000000;
+        }
+        .frites-options.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="icons/icon-192x192.png" alt="Logo Café Bar le 31">
+        <h1>Café Bar le 31</h1>
+        <p>Smash Burgers • À emporter uniquement</p>
+        <div class="badges">
+            <span class="badge">🍔 Smash Burgers</span>
+            <span class="badge">📍 Avenue de la Gare 31</span>
+        </div>
+    </div>
+
+    <div class="nav">
+        <button class="active" onclick="showCategory('burgers', this)">🍔 Burgers</button>
+        <button onclick="showCategory('menus', this)">🎓 Menu Étudiant</button>
+        <button onclick="showCategory('desserts', this)">🍰 Desserts</button>
+    </div>
+
+    <div class="container">
+        <div id="burgers" class="category active"></div>
+        <div id="menus" class="category"></div>
+        <div id="desserts" class="category"></div>
+    </div>
+
+    <div class="cart">
+        <div>
+            <small id="cart-count" style="color:#000000;">0 article</small><br>
+            <strong style="color:#000000;">Total: <span id="cart-total" style="color:#000000;font-size:20px;">0.00</span> CHF</strong>
+        </div>
+        <button onclick="openOrder()" id="order-btn" disabled>📱 Commander</button>
+    </div>
+
+    <div id="installPrompt" class="install-prompt">
+        📲 Ajouter à l'écran d'accueil
+        <button onclick="installPWA()">Installer</button>
+    </div>
+
+    <div id="orderModal" onclick="if(event.target.id=='orderModal')closeOrder()">
+        <div class="modal-content">
+            <h2 style="color:#000000;border-bottom:2px solid #000000;padding-bottom:10px;">📝 Votre commande</h2>
+            <div id="order-list" style="background:#f5f5f5;padding:15px;border-radius:10px;margin:15px 0;max-height:200px;overflow-y:auto;border:1px solid #000000;"></div>
+
+            <div class="info-box">
+                <strong>📍 À emporter uniquement</strong><br>
+                Avenue de la Gare 31, 2800 Delémont<br>
+                Paiement sur place • Tél: 032 423 31 13
+            </div>
+
+            <div class="form-group">
+                <label>Nom et prénom *</label>
+                <input type="text" id="name" placeholder="Jean Dupont">
+            </div>
+
+            <div class="form-group">
+                <label>Téléphone *</label>
+                <input type="tel" id="phone" placeholder="079 123 45 67">
+            </div>
+
+            <div class="form-group">
+                <label>Date et heure de retrait * (minimum 45 min après)</label>
+                <div class="datetime-row">
+                    <div><input type="date" id="delivery-date" onchange="updateTimes()"></div>
+                    <div><select id="delivery-time"><option value="">Choisir l'heure</option></select></div>
+                </div>
+                <small style="color:#666;">Service: 11h30-14h00 uniquement</small>
+            </div>
+
+            <div class="form-group">
+                <label>Commentaires</label>
+                <textarea id="notes" rows="2" placeholder="Allergies, préférences..."></textarea>
+            </div>
+
+            <button class="btn-primary" onclick="sendOrder()">📲 Confirmer par WhatsApp</button>
+        </div>
+    </div>
+
+    <script>
+        var menuData = {
+            burgers: [
+                {n: "Smash Burger M", d: "1 steak Smash", p: 11.00},
+                {n: "Smash Burger L", d: "2 steaks Smash", p: 13.00},
+                {n: "Smash Burger XL", d: "3 steaks Smash", p: 15.00}
+            ],
+            menus: [
+                {n: "Menu Étudiant M", d: "Burger M + frites + soft 3dl (sur présentation carte étudiant)", p: 14.00}
+            ],
+            desserts: [
+                {n: "Tiramisu Classique", d: "Le classique italien", p: 6.00},
+                {n: "Tiramisu Speculoos", d: "Au goût de speculoos", p: 6.00},
+                {n: "Tiramisu Oreo", d: "Aux biscuits Oreo", p: 6.00}
+            ]
+        };
+
+        var supplements = [
+            {id: 'bacon', n: 'Bacon', p: 2.50},
+            {id: 'oeuf', n: 'Oeuf', p: 2.50},
+            {id: 'avocat', n: 'Avocat', p: 2.50}
+        ];
+
+        var cart = {};
+        var cartSupplements = {};
+        var cartMenuOption = {};
+        var deferredPrompt;
+
+        function init() {
+            var burgersHtml = '<div class="info-box">🥩 Chaque burger inclut: cheddar, oignons caramélisés, sauce maison</div>';
+            for (var i = 0; i < menuData.burgers.length; i++) {
+                var it = menuData.burgers[i];
+                var id = 'burgers-' + i;
+                burgersHtml += generateBurgerHtml(id, it);
+            }
+            document.getElementById('burgers').innerHTML = burgersHtml;
+
+            var menusHtml = '<div class="info-box">🎓 Sur présentation de votre carte étudiante uniquement</div>';
+            for (var i = 0; i < menuData.menus.length; i++) {
+                var it = menuData.menus[i];
+                var id = 'menus-' + i;
+                menusHtml += generateItemHtml(id, it);
+            }
+            document.getElementById('menus').innerHTML = menusHtml;
+
+            var dessertsHtml = '';
+            for (var i = 0; i < menuData.desserts.length; i++) {
+                var it = menuData.desserts[i];
+                var id = 'desserts-' + i;
+                dessertsHtml += generateItemHtml(id, it);
+            }
+            document.getElementById('desserts').innerHTML = dessertsHtml;
+
+            initDate();
+            
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(reg) { console.log('SW registered'); })
+                    .catch(function(err) { console.log('SW error', err); });
+            }
+            
+            window.addEventListener('beforeinstallprompt', function(e) {
+                e.preventDefault();
+                deferredPrompt = e;
+                document.getElementById('installPrompt').style.display = 'flex';
+            });
+            
+            window.addEventListener('appinstalled', function() {
+                document.getElementById('installPrompt').style.display = 'none';
+                deferredPrompt = null;
+            });
+        }
+        
+        function generateBurgerHtml(id, it) {
+            var html = '<div class="item">';
+            html += '<h3>' + it.n + '</h3>';
+            html += '<p>' + it.d + '</p>';
+            html += '<div class="price">' + it.p.toFixed(2) + ' CHF</div>';
+            
+            html += '<div class="section-title">🍟 Menu (+5 CHF)</div>';
+            html += '<div class="checkbox-option" onclick="toggleMenuOption(\'' + id + '\')" id="menu-option-' + id + '">';
+            html += '<input type="checkbox" id="' + id + '-menu" onchange="updateMenuOption(\'' + id + '\')">';
+            html += '<label for="' + id + '-menu">';
+            html += '<span>Ajouter Menu (+5 CHF)</span>';
+            html += '<span class="price">Inclut frites + soft 3dl</span>';
+            html += '</label>';
+            html += '</div>';
+            
+            html += '<div class="frites-options" id="frites-options-' + id + '">';
+            html += '<div style="font-weight:bold;margin-bottom:8px;">Choix des frites:</div>';
+            html += '<div class="radio-group">';
+            html += '<div class="radio-option" onclick="selectFrites(\'' + id + '\', \'pomme\')" id="frites-pomme-' + id + '">';
+            html += '<label><input type="radio" name="frites-' + id + '" value="pomme" onchange="updateFrites(\'' + id + '\', \'pomme\')"> 🥔 Pommes de terre</label>';
+            html += '</div>';
+            html += '<div class="radio-option" onclick="selectFrites(\'' + id + '\', \'patate\')" id="frites-patate-' + id + '">';
+            html += '<label><input type="radio" name="frites-' + id + '" value="patate" onchange="updateFrites(\'' + id + '\', \'patate\')"> 🍠 Patates douces</label>';
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+            
+            html += '<div class="section-title">➕ Suppléments (facultatifs)</div>';
+            html += '<div class="checkbox-group">';
+            for (var s = 0; s < supplements.length; s++) {
+                var sup = supplements[s];
+                html += '<div class="checkbox-option" onclick="toggleSupplement(\'' + id + '\', \'' + sup.id + '\')" id="supp-' + id + '-' + sup.id + '">';
+                html += '<input type="checkbox" id="' + id + '-' + sup.id + '" onchange="updateSupplement(\'' + id + '\', \'' + sup.id + '\')">';
+                html += '<label for="' + id + '-' + sup.id + '">';
+                html += '<span>' + sup.n + '</span>';
+                html += '<span class="price">+' + sup.p.toFixed(2) + ' CHF</span>';
+                html += '</label>';
+                html += '</div>';
+            }
+            html += '</div>';
+            
+            html += '<div class="qty-control">';
+            html += '<button onclick="updateQty(\'' + id + '\', -1)" disabled id="btn-min-' + id + '">-</button>';
+            html += '<span id="qty-' + id + '">0</span>';
+            html += '<button onclick="updateQty(\'' + id + '\', 1)" id="btn-plus-' + id + '">+</button>';
+            html += '</div></div>';
+            return html;
+        }
+        
+        function generateItemHtml(id, it) {
+            var html = '<div class="item">';
+            html += '<h3>' + it.n + '</h3>';
+            html += '<p>' + it.d + '</p>';
+            html += '<div class="price">' + it.p.toFixed(2) + ' CHF</div>';
+            
+            html += '<div class="qty-control">';
+            html += '<button onclick="updateQty(\'' + id + '\', -1)" disabled id="btn-min-' + id + '">-</button>';
+            html += '<span id="qty-' + id + '">0</span>';
+            html += '<button onclick="updateQty(\'' + id + '\', 1)" id="btn-plus-' + id + '">+</button>';
+            html += '</div></div>';
+            return html;
+        }
+        
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(function(choiceResult) {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('PWA installed');
+                    }
+                    document.getElementById('installPrompt').style.display = 'none';
+                    deferredPrompt = null;
+                });
+            }
+        }
+
+        function showCategory(catId, btn) {
+            var cats = document.getElementsByClassName('category');
+            for (var i = 0; i < cats.length; i++) cats[i].classList.remove('active');
+            document.getElementById(catId).classList.add('active');
+            var buttons = document.querySelectorAll('.nav button');
+            for (var i = 0; i < buttons.length; i++) buttons[i].classList.remove('active');
+            btn.classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function toggleMenuOption(itemId) {
+            var checkbox = document.getElementById(itemId + '-menu');
+            checkbox.checked = !checkbox.checked;
+            updateMenuOption(itemId);
+        }
+        
+        function updateMenuOption(itemId) {
+            var checkbox = document.getElementById(itemId + '-menu');
+            var fritesDiv = document.getElementById('frites-options-' + itemId);
+            var menuOption = document.getElementById('menu-option-' + itemId);
+            
+            if (!cartMenuOption[itemId]) cartMenuOption[itemId] = {menu: false, frites: null};
+            
+            if (checkbox.checked) {
+                cartMenuOption[itemId].menu = true;
+                fritesDiv.classList.add('show');
+                menuOption.classList.add('selected');
+            } else {
+                cartMenuOption[itemId].menu = false;
+                cartMenuOption[itemId].frites = null;
+                fritesDiv.classList.remove('show');
+                menuOption.classList.remove('selected');
+                document.querySelectorAll('input[name="frites-' + itemId + '"]').forEach(function(el) {
+                    el.checked = false;
+                });
+                document.getElementById('frites-pomme-' + itemId).classList.remove('selected');
+                document.getElementById('frites-patate-' + itemId).classList.remove('selected');
+            }
+            updateCartDisplay();
+        }
+        
+        function selectFrites(itemId, type) {
+            var radio = document.querySelector('input[name="frites-' + itemId + '"][value="' + type + '"]');
+            radio.checked = true;
+            updateFrites(itemId, type);
+        }
+        
+        function updateFrites(itemId, type) {
+            if (!cartMenuOption[itemId]) cartMenuOption[itemId] = {menu: false, frites: null};
+            cartMenuOption[itemId].frites = type;
+            
+            document.getElementById('frites-pomme-' + itemId).classList.remove('selected');
+            document.getElementById('frites-patate-' + itemId).classList.remove('selected');
+            document.getElementById('frites-' + type + '-' + itemId).classList.add('selected');
+            
+            updateCartDisplay();
+        }
+
+        function toggleSupplement(itemId, supId) {
+            var checkbox = document.getElementById(itemId + '-' + supId);
+            checkbox.checked = !checkbox.checked;
+            updateSupplement(itemId, supId);
+        }
+        
+        function updateSupplement(itemId, supId) {
+            var checkbox = document.getElementById(itemId + '-' + supId);
+            var suppOption = document.getElementById('supp-' + itemId + '-' + supId);
+            
+            if (!cartSupplements[itemId]) cartSupplements[itemId] = [];
+            
+            if (checkbox.checked) {
+                if (cartSupplements[itemId].indexOf(supId) === -1) {
+                    cartSupplements[itemId].push(supId);
+                }
+                suppOption.classList.add('selected');
+            } else {
+                cartSupplements[itemId] = cartSupplements[itemId].filter(function(id) { return id !== supId; });
+                suppOption.classList.remove('selected');
+            }
+            updateCartDisplay();
+        }
+
+        function updateQty(id, change) {
+            if (!cart[id]) cart[id] = 0;
+            cart[id] += change;
+            if (cart[id] < 0) cart[id] = 0;
+            if (cart[id] > 10) cart[id] = 10;
+            
+            document.getElementById('qty-' + id).textContent = cart[id];
+            document.getElementById('btn-min-' + id).disabled = (cart[id] <= 0);
+            document.getElementById('btn-plus-' + id).disabled = (cart[id] >= 10);
+            
+            if (cart[id] === 0) {
+                cartSupplements[id] = [];
+                cartMenuOption[id] = {menu: false, frites: null};
+                
+                var checkboxes = document.querySelectorAll('#' + id + '-menu, [id^="' + id + '-"][type="checkbox"]');
+                checkboxes.forEach(function(cb) { 
+                    cb.checked = false; 
+                    var parent = cb.closest('.checkbox-option');
+                    if (parent) parent.classList.remove('selected');
+                });
+                
+                var fritesDiv = document.getElementById('frites-options-' + id);
+                if (fritesDiv) fritesDiv.classList.remove('show');
+                
+                document.querySelectorAll('input[name="frites-' + id + '"]').forEach(function(el) {
+                    el.checked = false;
+                });
+                document.getElementById('frites-pomme-' + id).classList.remove('selected');
+                document.getElementById('frites-patate-' + id).classList.remove('selected');
+            }
+            
+            updateCartDisplay();
+        }
+
+        function updateCartDisplay() {
+            var total = 0, count = 0;
+            for (var id in cart) {
+                if (cart[id] > 0) {
+                    var parts = id.split('-');
+                    var cat = parts[0];
+                    var idx = parseInt(parts[1]);
+                    var item = menuData[cat][idx];
+                    var itemTotal = item.p * cart[id];
+                    
+                    if (cartMenuOption[id] && cartMenuOption[id].menu) {
+                        itemTotal += 5.00 * cart[id];
+                    }
+                    
+                    if (cartSupplements[id]) {
+                        for (var s = 0; s < cartSupplements[id].length; s++) {
+                            var supId = cartSupplements[id][s];
+                            var sup = supplements.find(function(x) { return x.id === supId; });
+                            if (sup) itemTotal += sup.p * cart[id];
+                        }
+                    }
+                    
+                    total += itemTotal;
+                    count += cart[id];
+                }
+            }
+            document.getElementById('cart-total').textContent = total.toFixed(2);
+            document.getElementById('cart-count').textContent = count + (count > 1 ? ' articles' : ' article');
+            document.getElementById('order-btn').disabled = (count === 0);
+        }
+
+        function initDate() {
+            var today = new Date();
+            var yyyy = today.getFullYear();
+            var mm = String(today.getMonth() + 1).padStart(2, '0');
+            var dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('delivery-date').min = yyyy + '-' + mm + '-' + dd;
+            document.getElementById('delivery-date').value = yyyy + '-' + mm + '-' + dd;
+            updateTimes();
+        }
+
+        function updateTimes() {
+            var dateInput = document.getElementById('delivery-date').value;
+            var timeSelect = document.getElementById('delivery-time');
+            timeSelect.innerHTML = '<option value="">Choisir l\'heure</option>';
+            if (!dateInput) return;
+            var selectedDate = new Date(dateInput);
+            var now = new Date();
+            var isToday = selectedDate.toDateString() === now.toDateString();
+            
+            var slots = [];
+            for (var h = 11; h <= 14; h++) {
+                for (var m = 0; m < 60; m += 15) {
+                    if (h === 11 && m < 30) continue;
+                    if (h === 14 && m > 0) break;
+                    slots.push({h: h, m: m});
+                }
+            }
+            
+            if (isToday) {
+                var minTime = new Date(now.getTime() + 45 * 60000);
+                slots = slots.filter(function(slot) {
+                    var slotTime = new Date();
+                    slotTime.setHours(slot.h, slot.m, 0, 0);
+                    return slotTime >= minTime;
+                });
+            }
+            
+            for (var i = 0; i < slots.length; i++) {
+                var timeStr = String(slots[i].h).padStart(2, '0') + ':' + String(slots[i].m).padStart(2, '0');
+                var opt = document.createElement('option');
+                opt.value = timeStr;
+                opt.textContent = timeStr;
+                timeSelect.appendChild(opt);
+            }
+        }
+
+        function openOrder() {
+            updateTimes();
+            var list = document.getElementById('order-list');
+            var html = '';
+            var total = 0;
+            
+            for (var id in cart) {
+                if (cart[id] > 0) {
+                    var parts = id.split('-');
+                    var cat = parts[0];
+                    var idx = parseInt(parts[1]);
+                    var it = menuData[cat][idx];
+                    var itemTotal = it.p * cart[id];
+                    var details = [];
+                    
+                    if (cartMenuOption[id] && cartMenuOption[id].menu) {
+                        itemTotal += 5.00 * cart[id];
+                        var fritesType = cartMenuOption[id].frites === 'patate' ? 'patates douces' : 'pommes de terre';
+                        details.push('Menu (+5 CHF) avec frites ' + fritesType);
+                    }
+                    
+                    if (cartSupplements[id] && cartSupplements[id].length > 0) {
+                        var supps = [];
+                        for (var s = 0; s < cartSupplements[id].length; s++) {
+                            var supId = cartSupplements[id][s];
+                            var sup = supplements.find(function(x) { return x.id === supId; });
+                            if (sup) {
+                                itemTotal += sup.p * cart[id];
+                                supps.push(sup.n);
+                            }
+                        }
+                        if (supps.length > 0) details.push('Suppléments: ' + supps.join(', '));
+                    }
+                    
+                    total += itemTotal;
+                    html += '<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #ddd;">';
+                    html += '<span>' + cart[id] + '× ' + it.n + (details.length > 0 ? '<br><small>' + details.join('<br>') + '</small>' : '') + '</span>';
+                    html += '<span>' + itemTotal.toFixed(2) + ' CHF</span></div>';
+                }
+            }
+            
+            html += '<div style="font-weight:bold;color:#000000;font-size:18px;margin-top:10px;padding-top:10px;border-top:2px solid #000000;display:flex;justify-content:space-between;">';
+            html += '<span>TOTAL</span><span>' + total.toFixed(2) + ' CHF</span></div>';
+            list.innerHTML = html;
+            document.getElementById('orderModal').classList.add('show');
+        }
+
+        function closeOrder() {
+            document.getElementById('orderModal').classList.remove('show');
+        }
+
+        function sendOrder() {
+            var name = document.getElementById('name').value.trim();
+            var phone = document.getElementById('phone').value.trim();
+            var date = document.getElementById('delivery-date').value;
+            var time = document.getElementById('delivery-time').value;
+            var notes = document.getElementById('notes').value.trim();
+
+            if (!name || !phone) { alert('Veuillez remplir le nom et téléphone'); return; }
+            if (!date || !time) { alert('Veuillez choisir la date et l\'heure de retrait'); return; }
+
+            var msg = '🍔 *NOUVELLE COMMANDE CAFE BAR LE 31* %0A%0A';
+            msg += '👤 *Client:* ' + encodeURIComponent(name) + '%0A';
+            msg += '📞 *Téléphone:* ' + encodeURIComponent(phone) + '%0A';
+            msg += '📅 *Date de retrait:* ' + date + '%0A';
+            msg += '🕐 *Heure de retrait:* ' + time + '%0A';
+            msg += '📍 *Adresse:* Avenue de la Gare 31, 2800 Delémont%0A%0A';
+            msg += '*Commande:*%0A';
+
+            var total = 0;
+            for (var id in cart) {
+                if (cart[id] > 0) {
+                    var parts = id.split('-');
+                    var cat = parts[0];
+                    var idx = parseInt(parts[1]);
+                    var it = menuData[cat][idx];
+                    var itemTotal = it.p * cart[id];
+                    
+                    msg += '• ' + cart[id] + '× ' + it.n;
+                    
+                    if (cartMenuOption[id] && cartMenuOption[id].menu) {
+                        itemTotal += 5.00 * cart[id];
+                        var fritesType = cartMenuOption[id].frites === 'patate' ? 'patates douces' : 'pommes de terre';
+                        msg += ' + Menu (frites ' + fritesType + ' + soft)';
+                    }
+                    
+                    if (cartSupplements[id] && cartSupplements[id].length > 0) {
+                        msg += ' avec ';
+                        for (var s = 0; s < cartSupplements[id].length; s++) {
+                            var supId = cartSupplements[id][s];
+                            var sup = supplements.find(function(x) { return x.id === supId; });
+                            if (sup) {
+                                itemTotal += sup.p * cart[id];
+                                msg += sup.n;
+                                if (s < cartSupplements[id].length - 1) msg += ', ';
+                            }
+                        }
+                    }
+                    
+                    msg += ' - ' + itemTotal.toFixed(2) + ' CHF%0A';
+                    total += itemTotal;
+                }
+            }
+            
+            msg += '%0A💰 *TOTAL: ' + total.toFixed(2) + ' CHF*';
+            if (notes) msg += '%0A%0A📝 *Commentaires:* ' + encodeURIComponent(notes);
+            msg += '%0A%0A_À emporter • Paiement sur place_';
+
+            window.open('https://wa.me/41783280311?text=' + msg, '_blank');
+
+            cart = {};
+            cartSupplements = {};
+            cartMenuOption = {};
+            document.querySelectorAll('.qty-control span').forEach(function(el) { el.textContent = '0'; });
+            document.querySelectorAll('.qty-control button:first-child').forEach(function(el) { el.disabled = true; });
+            document.querySelectorAll('input[type="checkbox"]').forEach(function(el) { 
+                el.checked = false; 
+                var parent = el.closest('.checkbox-option');
+                if (parent) parent.classList.remove('selected');
+            });
+            document.querySelectorAll('.frites-options').forEach(function(el) { el.classList.remove('show'); });
+            document.querySelectorAll('.radio-option').forEach(function(el) { el.classList.remove('selected'); });
+            document.querySelectorAll('input[type="radio"]').forEach(function(el) { el.checked = false; });
+            
+            updateCartDisplay();
+            closeOrder();
+            document.getElementById('name').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('notes').value = '';
+            initDate();
+        }
+
+        init();
+    </script>
+</body>
+</html>
