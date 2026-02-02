@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Café Bar le 31 - Smash Burgers</title>
+    <title>Le 31 - Smash Burgers</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #fff; padding-bottom: 100px; }
         .header { background: #000; color: #fff; padding: 20px; text-align: center; }
-        .header img { width: 100px; height: 100px; border-radius: 50%; background: #fff; object-fit: cover; display: block; margin: 0 auto 10px; }
+        .header img { width: 100px; height: 100px; border-radius: 50%; background: #fff; object-fit: contain; display: block; margin: 0 auto 10px; border: 3px solid #fff; }
         .nav { display: flex; gap: 10px; padding: 15px; overflow-x: auto; background: #fff; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #000; }
         .nav button { padding: 12px 20px; border: 2px solid #000; background: #fff; border-radius: 25px; font-weight: bold; cursor: pointer; white-space: nowrap; }
         .nav button.active { background: #000; color: #fff; }
@@ -73,7 +73,7 @@
 </head>
 <body>
     <div class="header">
-       <img src="https://raw.githubusercontent.com/Helveticonc/Le31/main/logo-officiel.png" alt="Logo Café Bar le 31" style="width:100px;height:100px;border-radius:50%;background:#fff;object-fit:contain;display:block;margin:0 auto 10px;border:3px solid #fff;">
+        <img src="https://raw.githubusercontent.com/Helveticonc/Le31/main/logo-officiel.png" alt="Logo Café Bar le 31" id="logo-img">
         <h1>Le 31</h1>
         <p>Smash Burgers • À emporter</p>
         <div>
@@ -449,7 +449,7 @@
             if (!name || !phone) { alert('Veuillez remplir le nom et téléphone'); return; }
             if (!date || !time) { alert('Veuillez choisir la date et l\'heure'); return; }
             
-            var msg = '🍔 *COMMANDE CAFE BAR LE 31*\n\n';
+            var msg = '🍔 *COMMANDE LE 31*\n\n';
             msg += '👤 ' + name + '\n';
             msg += '📞 ' + phone + '\n';
             msg += '📅 ' + date + ' à ' + time + '\n';
@@ -484,7 +484,7 @@
             msg += '\n💰 *TOTAL: ' + total.toFixed(2) + ' CHF*';
             if (notes) msg += '\n\n📝 ' + notes;
             
-            window.open('https://wa.me/41783280311?text=' + encodeURIComponent(msg), '_blank');
+            window.open('https://wa.me/41783280311?text= ' + encodeURIComponent(msg), '_blank');
             
             // Reset
             cart = {};
@@ -496,30 +496,7 @@
             closeOrder();
         }
         
-               init();
-    </script>
-    
-    <script>
-    // Vérification et affichage du logo
-    var img = new Image();
-    img.onload = function() {
-        document.getElementById('logo-img').src = './logo-officiel.png';
-        document.getElementById('logo-img').style.display = 'block';
-    };
-    img.onerror = function() {
-        // Essai avec chemin alternatif
-        var img2 = new Image();
-        img2.onload = function() {
-            document.getElementById('logo-img').src = 'logo-officiel.png';
-            document.getElementById('logo-img').style.display = 'block';
-        };
-        img2.onerror = function() {
-            console.log('Logo non trouvé');
-        };
-        img2.src = 'logo-officiel.png';
-    };
-    img.src = './logo-officiel.png';
+        init();
     </script>
 </body>
 </html>
-
