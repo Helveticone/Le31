@@ -526,7 +526,7 @@
             html += '<div class="price">' + it.p.toFixed(2) + ' CHF</div>';
             
             html += '<div class="section-title">🍟 Menu (+5 CHF)</div>';
-            // CORRECTION: Suppression du onclick sur le div parent, gestion uniquement via le checkbox
+            // CORRECTION: Plus de onclick sur le div parent
             html += '<div class="checkbox-option" id="menu-option-' + id + '">';
             html += '<input type="checkbox" id="' + id + '-menu" onchange="updateMenuOption(\'' + id + '\')">';
             html += '<label for="' + id + '-menu">';
@@ -538,7 +538,6 @@
             html += '<div class="frites-options" id="frites-options-' + id + '">';
             html += '<div style="font-weight:bold;margin-bottom:8px;">Choix des frites:</div>';
             html += '<div class="radio-group">';
-            // CORRECTION: Suppression du onclick sur le div parent
             html += '<div class="radio-option" id="frites-pomme-' + id + '" onclick="selectFrites(\'' + id + '\', \'pomme\')">';
             html += '<label><input type="radio" name="frites-' + id + '" value="pomme" onchange="updateFrites(\'' + id + '\', \'pomme\')"> 🥔 Pommes de terre</label>';
             html += '</div>';
@@ -552,7 +551,7 @@
             html += '<div class="checkbox-group">';
             for (var s = 0; s < supplements.length; s++) {
                 var sup = supplements[s];
-                // CORRECTION: Suppression du onclick sur le div parent
+                // CORRECTION: Plus de onclick sur le div parent
                 html += '<div class="checkbox-option" id="supp-' + id + '-' + sup.id + '">';
                 html += '<input type="checkbox" id="' + id + '-' + sup.id + '" onchange="updateSupplement(\'' + id + '\', \'' + sup.id + '\')">';
                 html += '<label for="' + id + '-' + sup.id + '">';
@@ -608,7 +607,6 @@
             window.scrollTo(0, 0);
         }
 
-        // CORRECTION: Suppression de toggleMenuOption, gestion uniquement via onchange
         function updateMenuOption(itemId) {
             var checkbox = document.getElementById(itemId + '-menu');
             var fritesDiv = document.getElementById('frites-options-' + itemId);
@@ -654,7 +652,6 @@
             updateCartDisplay();
         }
 
-        // CORRECTION: Suppression de toggleSupplement, gestion uniquement via onchange
         function updateSupplement(itemId, supId) {
             var checkbox = document.getElementById(itemId + '-' + supId);
             var suppOption = document.getElementById('supp-' + itemId + '-' + supId);
