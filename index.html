@@ -73,7 +73,7 @@
 </head>
 <body>
     <div class="header">
-        <img src="logo-officiel.png" alt="Logo" onerror="this.style.display='none'">
+        <img src="./logo-officiel.png" alt="Logo" id="logo-img" style="display:none;">
         <h1>Café Bar le 31</h1>
         <p>Smash Burgers • À emporter</p>
         <div>
@@ -496,7 +496,29 @@
             closeOrder();
         }
         
-        init();
+               init();
+    </script>
+    
+    <script>
+    // Vérification et affichage du logo
+    var img = new Image();
+    img.onload = function() {
+        document.getElementById('logo-img').src = './logo-officiel.png';
+        document.getElementById('logo-img').style.display = 'block';
+    };
+    img.onerror = function() {
+        // Essai avec chemin alternatif
+        var img2 = new Image();
+        img2.onload = function() {
+            document.getElementById('logo-img').src = 'logo-officiel.png';
+            document.getElementById('logo-img').style.display = 'block';
+        };
+        img2.onerror = function() {
+            console.log('Logo non trouvé');
+        };
+        img2.src = 'logo-officiel.png';
+    };
+    img.src = './logo-officiel.png';
     </script>
 </body>
 </html>
