@@ -26,6 +26,7 @@
             min-height: 100%;
             overscroll-behavior-y: none;
             color: #000000;
+            touch-action: manipulation;
         }
 
         .header { 
@@ -126,6 +127,9 @@
             font-weight: bold; 
             cursor: pointer; 
             transition: all 0.2s; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .qty-control button:hover:not(:disabled) { background: #333333; transform: scale(1.1); }
         .qty-control button:disabled { background: #cccccc; border-color: #cccccc; cursor: not-allowed; }
@@ -219,6 +223,8 @@
             cursor: pointer; 
             transition: all 0.2s;
             background: #ffffff;
+            position: relative;
+            user-select: none;
         }
         .checkbox-option:hover { background: #f5f5f5; }
         .checkbox-option.selected { 
@@ -232,6 +238,7 @@
             margin-right: 10px; 
             cursor: pointer;
             accent-color: #000000;
+            flex-shrink: 0;
         }
         .checkbox-option label { 
             display: flex; 
@@ -240,6 +247,7 @@
             cursor: pointer;
             margin: 0;
             color: inherit;
+            pointer-events: none;
         }
         .checkbox-option .price { color: #000000; font-weight: bold; }
 
@@ -253,6 +261,8 @@
             text-align: center; 
             transition: all 0.2s; 
             background: #ffffff;
+            position: relative;
+            user-select: none;
         }
         .radio-option:hover { background: #f5f5f5; }
         .radio-option.selected { 
@@ -266,8 +276,14 @@
             cursor: pointer; 
             font-weight: normal; 
             color: inherit;
+            pointer-events: none;
         }
-        .radio-option input { width: auto; margin-right: 8px; cursor: pointer; }
+        .radio-option input { 
+            width: auto; 
+            margin-right: 8px; 
+            cursor: pointer; 
+            flex-shrink: 0;
+        }
 
         .datetime-row { display: flex; gap: 10px; }
         .datetime-row > div { flex: 1; }
@@ -356,7 +372,8 @@
 </head>
 <body>
     <div class="header">
-        <img src="icons/icon-192x192.png" alt="Logo Café Bar le 31">
+        <!-- REMPLACE PAR TON LOGO OFFICIEL ICI -->
+        <img src="logo-officiel.png" alt="Logo Café Bar le 31" onerror="this.src='icons/icon-192x192.png'">
         <h1>Café Bar le 31</h1>
         <p>Smash Burgers • À emporter uniquement</p>
         <div class="badges">
@@ -509,7 +526,8 @@
             html += '<div class="price">' + it.p.toFixed(2) + ' CHF</div>';
             
             html += '<div class="section-title">🍟 Menu (+5 CHF)</div>';
-            html += '<div class="checkbox-option" onclick="toggleMenuOption(\'' + id + '\')" id="menu-option-' + id + '">';
+            // CORRECTION: Suppression du onclick sur le div parent, gestion uniquement via le checkbox
+            html += '<div class="checkbox-option" id="menu-option-' + id + '">';
             html += '<input type="checkbox" id="' + id + '-menu" onchange="updateMenuOption(\'' + id + '\')">';
             html += '<label for="' + id + '-menu">';
             html += '<span>Ajouter Menu (+5 CHF)</span>';
@@ -520,10 +538,11 @@
             html += '<div class="frites-options" id="frites-options-' + id + '">';
             html += '<div style="font-weight:bold;margin-bottom:8px;">Choix des frites:</div>';
             html += '<div class="radio-group">';
-            html += '<div class="radio-option" onclick="selectFrites(\'' + id + '\', \'pomme\')" id="frites-pomme-' + id + '">';
+            // CORRECTION: Suppression du onclick sur le div parent
+            html += '<div class="radio-option" id="frites-pomme-' + id + '" onclick="selectFrites(\'' + id + '\', \'pomme\')">';
             html += '<label><input type="radio" name="frites-' + id + '" value="pomme" onchange="updateFrites(\'' + id + '\', \'pomme\')"> 🥔 Pommes de terre</label>';
             html += '</div>';
-            html += '<div class="radio-option" onclick="selectFrites(\'' + id + '\', \'patate\')" id="frites-patate-' + id + '">';
+            html += '<div class="radio-option" id="frites-patate-' + id + '" onclick="selectFrites(\'' + id + '\', \'patate\')">';
             html += '<label><input type="radio" name="frites-' + id + '" value="patate" onchange="updateFrites(\'' + id + '\', \'patate\')"> 🍠 Patates douces</label>';
             html += '</div>';
             html += '</div>';
@@ -533,7 +552,8 @@
             html += '<div class="checkbox-group">';
             for (var s = 0; s < supplements.length; s++) {
                 var sup = supplements[s];
-                html += '<div class="checkbox-option" onclick="toggleSupplement(\'' + id + '\', \'' + sup.id + '\')" id="supp-' + id + '-' + sup.id + '">';
+                // CORRECTION: Suppression du onclick sur le div parent
+                html += '<div class="checkbox-option" id="supp-' + id + '-' + sup.id + '">';
                 html += '<input type="checkbox" id="' + id + '-' + sup.id + '" onchange="updateSupplement(\'' + id + '\', \'' + sup.id + '\')">';
                 html += '<label for="' + id + '-' + sup.id + '">';
                 html += '<span>' + sup.n + '</span>';
@@ -588,12 +608,7 @@
             window.scrollTo(0, 0);
         }
 
-        function toggleMenuOption(itemId) {
-            var checkbox = document.getElementById(itemId + '-menu');
-            checkbox.checked = !checkbox.checked;
-            updateMenuOption(itemId);
-        }
-        
+        // CORRECTION: Suppression de toggleMenuOption, gestion uniquement via onchange
         function updateMenuOption(itemId) {
             var checkbox = document.getElementById(itemId + '-menu');
             var fritesDiv = document.getElementById('frites-options-' + itemId);
@@ -610,9 +625,10 @@
                 cartMenuOption[itemId].frites = null;
                 fritesDiv.classList.remove('show');
                 menuOption.classList.remove('selected');
-                document.querySelectorAll('input[name="frites-' + itemId + '"]').forEach(function(el) {
-                    el.checked = false;
-                });
+                var radios = document.querySelectorAll('input[name="frites-' + itemId + '"]');
+                for (var i = 0; i < radios.length; i++) {
+                    radios[i].checked = false;
+                }
                 document.getElementById('frites-pomme-' + itemId).classList.remove('selected');
                 document.getElementById('frites-patate-' + itemId).classList.remove('selected');
             }
@@ -621,8 +637,10 @@
         
         function selectFrites(itemId, type) {
             var radio = document.querySelector('input[name="frites-' + itemId + '"][value="' + type + '"]');
-            radio.checked = true;
-            updateFrites(itemId, type);
+            if (radio) {
+                radio.checked = true;
+                updateFrites(itemId, type);
+            }
         }
         
         function updateFrites(itemId, type) {
@@ -636,12 +654,7 @@
             updateCartDisplay();
         }
 
-        function toggleSupplement(itemId, supId) {
-            var checkbox = document.getElementById(itemId + '-' + supId);
-            checkbox.checked = !checkbox.checked;
-            updateSupplement(itemId, supId);
-        }
-        
+        // CORRECTION: Suppression de toggleSupplement, gestion uniquement via onchange
         function updateSupplement(itemId, supId) {
             var checkbox = document.getElementById(itemId + '-' + supId);
             var suppOption = document.getElementById('supp-' + itemId + '-' + supId);
@@ -654,7 +667,13 @@
                 }
                 suppOption.classList.add('selected');
             } else {
-                cartSupplements[itemId] = cartSupplements[itemId].filter(function(id) { return id !== supId; });
+                var newSupps = [];
+                for (var i = 0; i < cartSupplements[itemId].length; i++) {
+                    if (cartSupplements[itemId][i] !== supId) {
+                        newSupps.push(cartSupplements[itemId][i]);
+                    }
+                }
+                cartSupplements[itemId] = newSupps;
                 suppOption.classList.remove('selected');
             }
             updateCartDisplay();
@@ -675,18 +694,20 @@
                 cartMenuOption[id] = {menu: false, frites: null};
                 
                 var checkboxes = document.querySelectorAll('#' + id + '-menu, [id^="' + id + '-"][type="checkbox"]');
-                checkboxes.forEach(function(cb) { 
+                for (var i = 0; i < checkboxes.length; i++) {
+                    var cb = checkboxes[i];
                     cb.checked = false; 
                     var parent = cb.closest('.checkbox-option');
                     if (parent) parent.classList.remove('selected');
-                });
+                }
                 
                 var fritesDiv = document.getElementById('frites-options-' + id);
                 if (fritesDiv) fritesDiv.classList.remove('show');
                 
-                document.querySelectorAll('input[name="frites-' + id + '"]').forEach(function(el) {
-                    el.checked = false;
-                });
+                var radios = document.querySelectorAll('input[name="frites-' + id + '"]');
+                for (var i = 0; i < radios.length; i++) {
+                    radios[i].checked = false;
+                }
                 document.getElementById('frites-pomme-' + id).classList.remove('selected');
                 document.getElementById('frites-patate-' + id).classList.remove('selected');
             }
@@ -711,7 +732,13 @@
                     if (cartSupplements[id]) {
                         for (var s = 0; s < cartSupplements[id].length; s++) {
                             var supId = cartSupplements[id][s];
-                            var sup = supplements.find(function(x) { return x.id === supId; });
+                            var sup = null;
+                            for (var j = 0; j < supplements.length; j++) {
+                                if (supplements[j].id === supId) {
+                                    sup = supplements[j];
+                                    break;
+                                }
+                            }
                             if (sup) itemTotal += sup.p * cart[id];
                         }
                     }
@@ -796,7 +823,13 @@
                         var supps = [];
                         for (var s = 0; s < cartSupplements[id].length; s++) {
                             var supId = cartSupplements[id][s];
-                            var sup = supplements.find(function(x) { return x.id === supId; });
+                            var sup = null;
+                            for (var j = 0; j < supplements.length; j++) {
+                                if (supplements[j].id === supId) {
+                                    sup = supplements[j];
+                                    break;
+                                }
+                            }
                             if (sup) {
                                 itemTotal += sup.p * cart[id];
                                 supps.push(sup.n);
@@ -861,7 +894,13 @@
                         msg += ' avec ';
                         for (var s = 0; s < cartSupplements[id].length; s++) {
                             var supId = cartSupplements[id][s];
-                            var sup = supplements.find(function(x) { return x.id === supId; });
+                            var sup = null;
+                            for (var j = 0; j < supplements.length; j++) {
+                                if (supplements[j].id === supId) {
+                                    sup = supplements[j];
+                                    break;
+                                }
+                            }
                             if (sup) {
                                 itemTotal += sup.p * cart[id];
                                 msg += sup.n;
@@ -879,21 +918,27 @@
             if (notes) msg += '%0A%0A📝 *Commentaires:* ' + encodeURIComponent(notes);
             msg += '%0A%0A_À emporter • Paiement sur place_';
 
-            window.open('https://wa.me/41783280311?text=' + msg, '_blank');
+            window.open('https://wa.me/41783280311?text= ' + msg, '_blank');
 
             cart = {};
             cartSupplements = {};
             cartMenuOption = {};
-            document.querySelectorAll('.qty-control span').forEach(function(el) { el.textContent = '0'; });
-            document.querySelectorAll('.qty-control button:first-child').forEach(function(el) { el.disabled = true; });
-            document.querySelectorAll('input[type="checkbox"]').forEach(function(el) { 
-                el.checked = false; 
-                var parent = el.closest('.checkbox-option');
+            var qtySpans = document.querySelectorAll('.qty-control span');
+            for (var i = 0; i < qtySpans.length; i++) { qtySpans[i].textContent = '0'; }
+            var qtyBtns = document.querySelectorAll('.qty-control button:first-child');
+            for (var i = 0; i < qtyBtns.length; i++) { qtyBtns[i].disabled = true; }
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            for (var i = 0; i < checkboxes.length; i++) { 
+                checkboxes[i].checked = false; 
+                var parent = checkboxes[i].closest('.checkbox-option');
                 if (parent) parent.classList.remove('selected');
-            });
-            document.querySelectorAll('.frites-options').forEach(function(el) { el.classList.remove('show'); });
-            document.querySelectorAll('.radio-option').forEach(function(el) { el.classList.remove('selected'); });
-            document.querySelectorAll('input[type="radio"]').forEach(function(el) { el.checked = false; });
+            }
+            var fritesOpts = document.querySelectorAll('.frites-options');
+            for (var i = 0; i < fritesOpts.length; i++) { fritesOpts[i].classList.remove('show'); }
+            var radioOpts = document.querySelectorAll('.radio-option');
+            for (var i = 0; i < radioOpts.length; i++) { radioOpts[i].classList.remove('selected'); }
+            var radios = document.querySelectorAll('input[type="radio"]');
+            for (var i = 0; i < radios.length; i++) { radios[i].checked = false; }
             
             updateCartDisplay();
             closeOrder();
