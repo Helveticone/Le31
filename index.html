@@ -3,63 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#000000">
     <title>Café Bar le 31 - Smash Burgers</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #ffffff; padding-bottom: 100px; min-height: 100%; color: #000000; touch-action: manipulation; }
-        .header { background: #000000; color: #ffffff; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; border-bottom: 3px solid #000000; }
-        .header img { width: 120px; height: 120px; background: #ffffff; border-radius: 50%; margin-bottom: 10px; padding: 5px; border: 3px solid #ffffff; object-fit: contain; display: block; margin-left: auto; margin-right: auto; }
-        .nav { display: flex; overflow-x: auto; gap: 10px; padding: 15px; background: #ffffff; position: sticky; top: 180px; z-index: 99; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-bottom: 2px solid #000000; }
-        .nav button { flex-shrink: 0; padding: 12px 20px; border: 2px solid #000000; background: #ffffff; color: #000000; border-radius: 25px; font-weight: bold; font-size: 14px; cursor: pointer; }
-        .nav button.active { background: #000000; color: #ffffff; }
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #fff; padding-bottom: 100px; }
+        .header { background: #000; color: #fff; padding: 20px; text-align: center; }
+        .header img { width: 100px; height: 100px; border-radius: 50%; background: #fff; object-fit: cover; display: block; margin: 0 auto 10px; }
+        .nav { display: flex; gap: 10px; padding: 15px; overflow-x: auto; background: #fff; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #000; }
+        .nav button { padding: 12px 20px; border: 2px solid #000; background: #fff; border-radius: 25px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        .nav button.active { background: #000; color: #fff; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         .category { display: none; }
         .category.active { display: block; }
-        .item { background: #ffffff; border-radius: 12px; padding: 15px; margin-bottom: 12px; border: 2px solid #000000; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-        .item h3 { color: #000000; margin-bottom: 5px; font-size: 16px; font-weight: bold; }
-        .item .price { color: #000000; font-weight: bold; font-size: 18px; margin: 10px 0; }
-        .qty-control { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-        .qty-control button { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #000000; background: #000000; color: #ffffff; font-size: 18px; font-weight: bold; cursor: pointer; }
-        .qty-control button:disabled { background: #cccccc; border-color: #cccccc; }
-        .qty-control span { font-weight: bold; min-width: 30px; text-align: center; font-size: 16px; }
-        .cart { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; padding: 15px 20px; border-top: 3px solid #000000; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
-        .cart button { background: #000000; color: #ffffff; border: 2px solid #000000; padding: 15px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .cart button:disabled { background: #cccccc; }
-        #orderModal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: flex-end; justify-content: center; }
-        #orderModal.show { display: flex; }
-        .modal-content { background: #ffffff; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; border-radius: 20px 20px 0 0; padding: 25px; border-top: 3px solid #000000; }
-        .checkbox-row { display: flex; align-items: center; padding: 12px; border: 2px solid #000000; border-radius: 10px; margin: 8px 0; cursor: pointer; background: #ffffff; -webkit-tap-highlight-color: rgba(0,0,0,0.1); }
-        .checkbox-row.selected { background: #000000; color: #ffffff; }
-        .checkbox-row input[type="checkbox"] { width: 20px; height: 20px; margin-right: 10px; pointer-events: none; }
-        .checkbox-row .text { flex: 1; display: flex; justify-content: space-between; pointer-events: none; }
+        .item { border: 2px solid #000; border-radius: 10px; padding: 15px; margin-bottom: 15px; }
+        .item h3 { margin-bottom: 5px; }
+        .price { font-weight: bold; font-size: 18px; margin: 10px 0; }
+        
+        /* CHECKBOX SIMPLE - FONCTIONNE PARTOUT */
+        .check-line { 
+            display: flex; 
+            align-items: center; 
+            padding: 12px; 
+            border: 2px solid #000; 
+            border-radius: 8px; 
+            margin: 8px 0; 
+            cursor: pointer; 
+            background: #fff;
+        }
+        .check-line.checked { background: #000; color: #fff; }
+        .check-line input[type="checkbox"] { 
+            width: 20px; 
+            height: 20px; 
+            margin-right: 10px; 
+            cursor: pointer;
+        }
+        .check-line .txt { flex: 1; display: flex; justify-content: space-between; pointer-events: none; }
+        
         .radio-group { display: flex; gap: 10px; margin: 10px 0; }
-        .radio-box { flex: 1; padding: 12px; border: 2px solid #000000; border-radius: 10px; text-align: center; cursor: pointer; -webkit-tap-highlight-color: rgba(0,0,0,0.1); }
-        .radio-box.selected { background: #000000; color: #ffffff; }
-        .frites-box { display: none; margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 8px; border: 1px solid #000000; }
+        .radio-btn { 
+            flex: 1; 
+            padding: 10px; 
+            border: 2px solid #000; 
+            border-radius: 8px; 
+            text-align: center; 
+            cursor: pointer;
+            background: #fff;
+        }
+        .radio-btn.selected { background: #000; color: #fff; }
+        .frites-box { display: none; margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 8px; }
         .frites-box.show { display: block; }
-        .section-title { font-weight: bold; margin-top: 15px; margin-bottom: 8px; color: #000000; font-size: 14px; text-transform: uppercase; border-bottom: 1px solid #000000; padding-bottom: 5px; }
-        .btn-primary { width: 100%; background: #000000; color: #ffffff; border: 2px solid #000000; padding: 16px; border-radius: 25px; font-size: 16px; font-weight: bold; margin-top: 10px; cursor: pointer; }
-        input, textarea, select { width: 100%; padding: 12px; border: 2px solid #000000; border-radius: 10px; font-size: 15px; margin: 5px 0; }
-        .form-group { margin-bottom: 15px; }
-        .badge { display: inline-block; background: #ffffff; color: #000000; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: bold; margin: 2px; border: 2px solid #000000; }
+        
+        .qty-control { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .qty-control button { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #000; background: #000; color: #fff; font-size: 18px; cursor: pointer; }
+        .qty-control button:disabled { background: #ccc; border-color: #ccc; }
+        .qty-control span { min-width: 30px; text-align: center; font-weight: bold; }
+        
+        .cart { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 15px; border-top: 3px solid #000; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
+        .cart button { background: #000; color: #fff; border: none; padding: 15px 25px; border-radius: 25px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .cart button:disabled { background: #ccc; }
+        
+        #orderModal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: flex-end; justify-content: center; }
+        #orderModal.show { display: flex; }
+        .modal-content { background: #fff; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; border-radius: 20px 20px 0 0; padding: 20px; }
+        .section-title { font-weight: bold; margin: 15px 0 8px; padding-bottom: 5px; border-bottom: 1px solid #000; text-transform: uppercase; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 2px solid #000; border-radius: 8px; margin: 5px 0; font-size: 16px; }
+        .btn-primary { width: 100%; background: #000; color: #fff; border: none; padding: 16px; border-radius: 25px; font-size: 16px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .badge { display: inline-block; background: #fff; color: #000; padding: 5px 10px; border-radius: 15px; font-size: 12px; border: 2px solid #000; margin: 2px; }
     </style>
 </head>
 <body>
     <div class="header">
-        <img src="./logo-officiel.png" alt="Logo Café Bar le 31" id="logo-img">
+        <img src="logo-officiel.png" alt="Logo" onerror="this.style.display='none'">
         <h1>Café Bar le 31</h1>
-        <p>Smash Burgers • À emporter uniquement</p>
-        <div style="margin-top: 10px;">
+        <p>Smash Burgers • À emporter</p>
+        <div>
             <span class="badge">🍔 Smash Burgers</span>
             <span class="badge">📍 Avenue de la Gare 31</span>
         </div>
     </div>
 
     <div class="nav">
-        <button class="active" onclick="showCategory('burgers', this)">🍔 Burgers</button>
-        <button onclick="showCategory('menus', this)">🎓 Menu Étudiant</button>
-        <button onclick="showCategory('desserts', this)">🍰 Desserts</button>
+        <button class="active" onclick="showCat('burgers', this)">🍔 Burgers</button>
+        <button onclick="showCat('menus', this)">🎓 Menu Étudiant</button>
+        <button onclick="showCat('desserts', this)">🍰 Desserts</button>
     </div>
 
     <div class="container">
@@ -79,23 +105,23 @@
     <div id="orderModal" onclick="if(event.target.id=='orderModal')closeOrder()">
         <div class="modal-content">
             <h2>📝 Votre commande</h2>
-            <div id="order-list" style="background:#f5f5f5;padding:15px;border-radius:10px;margin:15px 0;max-height:200px;overflow-y:auto;"></div>
-            <div class="form-group">
+            <div id="order-list" style="background:#f5f5f5;padding:15px;border-radius:8px;margin:15px 0;max-height:200px;overflow-y:auto;"></div>
+            <div>
                 <label>Nom et prénom *</label>
                 <input type="text" id="name" placeholder="Jean Dupont">
             </div>
-            <div class="form-group">
+            <div>
                 <label>Téléphone *</label>
                 <input type="tel" id="phone" placeholder="079 123 45 67">
             </div>
-            <div class="form-group">
+            <div>
                 <label>Date et heure de retrait *</label>
                 <div style="display:flex;gap:10px;">
                     <input type="date" id="delivery-date" onchange="updateTimes()" style="flex:1;">
-                    <select id="delivery-time" style="flex:1;"><option value="">Choisir l'heure</option></select>
+                    <select id="delivery-time" style="flex:1;"><option value="">Choisir</option></select>
                 </div>
             </div>
-            <div class="form-group">
+            <div>
                 <label>Commentaires</label>
                 <textarea id="notes" rows="2" placeholder="Allergies..."></textarea>
             </div>
@@ -104,237 +130,217 @@
     </div>
 
     <script>
-        var menuData = {
-            burgers: [
-                {n: "Smash Burger M", d: "1 steak Smash", p: 11.00},
-                {n: "Smash Burger L", d: "2 steaks Smash", p: 13.00},
-                {n: "Smash Burger XL", d: "3 steaks Smash", p: 15.00}
-            ],
-            menus: [
-                {n: "Menu Étudiant M", d: "Burger M + frites + soft 3dl (sur présentation carte étudiant)", p: 14.00}
-            ],
-            desserts: [
-                {n: "Tiramisu Classique", d: "Le classique italien", p: 6.00},
-                {n: "Tiramisu Speculoos", d: "Au goût de speculoos", p: 6.00},
-                {n: "Tiramisu Oreo", d: "Aux biscuits Oreo", p: 6.00}
-            ]
-        };
-
-        var supplements = [
-            {id: 'bacon', n: 'Bacon', p: 2.50},
-            {id: 'oeuf', n: 'Oeuf', p: 2.50},
-            {id: 'avocat', n: 'Avocat', p: 2.50}
+        // DONNÉES
+        var burgers = [
+            {n: "Smash Burger M", d: "1 steak Smash", p: 11},
+            {n: "Smash Burger L", d: "2 steaks Smash", p: 13},
+            {n: "Smash Burger XL", d: "3 steaks Smash", p: 15}
         ];
-
-        var cart = {}, cartSupplements = {}, cartMenuOption = {};
-
-        function init() {
-            // Vérifier si le logo existe
-            var img = new Image();
-            img.onload = function() { document.getElementById('logo-img').src = './logo-officiel.png'; };
-            img.onerror = function() { document.getElementById('logo-img').style.display = 'none'; };
-            img.src = './logo-officiel.png';
-
-            var burgersHtml = '<div style="background:#fff;border:2px solid #000;padding:12px;margin-bottom:15px;border-radius:8px;">🥩 Chaque burger inclut: cheddar, oignons caramélisés, sauce maison</div>';
-            for (var i = 0; i < menuData.burgers.length; i++) {
-                burgersHtml += generateBurgerHtml('burgers-' + i, menuData.burgers[i]);
-            }
-            document.getElementById('burgers').innerHTML = burgersHtml;
-
-            var menusHtml = '<div style="background:#fff;border:2px solid #000;padding:12px;margin-bottom:15px;border-radius:8px;">🎓 Sur présentation de votre carte étudiante uniquement</div>';
-            for (var i = 0; i < menuData.menus.length; i++) {
-                menusHtml += generateItemHtml('menus-' + i, menuData.menus[i]);
-            }
-            document.getElementById('menus').innerHTML = menusHtml;
-
-            var dessertsHtml = '';
-            for (var i = 0; i < menuData.desserts.length; i++) {
-                dessertsHtml += generateItemHtml('desserts-' + i, menuData.desserts[i]);
-            }
-            document.getElementById('desserts').innerHTML = dessertsHtml;
-
-            initDate();
-        }
+        var supplements = [
+            {id: 'bacon', n: 'Bacon', p: 2.5},
+            {id: 'oeuf', n: 'Oeuf', p: 2.5},
+            {id: 'avocat', n: 'Avocat', p: 2.5}
+        ];
         
-        function generateBurgerHtml(id, it) {
-            var html = '<div class="item">';
-            html += '<h3>' + it.n + '</h3>';
-            html += '<p>' + it.d + '</p>';
-            html += '<div class="price">' + it.p.toFixed(2) + ' CHF</div>';
+        // ÉTAT
+        var cart = {};
+        var opts = {}; // options: {itemId: {menu: bool, frites: string, supps: []}}
+        
+        // INITIALISATION
+        function init() {
+            var html = '<div style="background:#fff;border:2px solid #000;padding:10px;margin-bottom:15px;border-radius:8px;">🥩 Chaque burger: cheddar, oignons caramélisés, sauce maison</div>';
             
-            html += '<div class="section-title">🍟 Menu (+5 CHF)</div>';
-            html += '<div class="checkbox-row" id="menu-row-' + id + '">';
-            html += '<input type="checkbox" id="' + id + '-menu">';
-            html += '<div class="text"><span>Ajouter Menu (+5 CHF)</span><span>Inclut frites + soft</span></div>';
-            html += '</div>';
-            
-            html += '<div class="frites-box" id="frites-box-' + id + '">';
-            html += '<div style="font-weight:bold;margin-bottom:8px;">Choix des frites:</div>';
-            html += '<div class="radio-group">';
-            html += '<div class="radio-box" id="frites-pomme-' + id + '">🥔 Pommes de terre</div>';
-            html += '<div class="radio-box" id="frites-patate-' + id + '">🍠 Patates douces</div>';
-            html += '</div>';
-            html += '</div>';
-            
-            html += '<div class="section-title">➕ Suppléments</div>';
-            for (var s = 0; s < supplements.length; s++) {
-                var sup = supplements[s];
-                html += '<div class="checkbox-row" id="supp-row-' + id + '-' + sup.id + '">';
-                html += '<input type="checkbox" id="' + id + '-' + sup.id + '">';
-                html += '<div class="text"><span>' + sup.n + '</span><span>+' + sup.p.toFixed(2) + ' CHF</span></div>';
+            for (var i = 0; i < burgers.length; i++) {
+                var b = burgers[i];
+                var id = 'b' + i;
+                html += '<div class="item">';
+                html += '<h3>' + b.n + '</h3>';
+                html += '<p>' + b.d + '</p>';
+                html += '<div class="price">' + b.p.toFixed(2) + ' CHF</div>';
+                
+                // MENU
+                html += '<div class="section-title">🍟 Menu (+5 CHF)</div>';
+                html += '<div class="check-line" onclick="toggleMenu(\'' + id + '\')">';
+                html += '<input type="checkbox" id="m-' + id + '" onclick="event.stopPropagation()">';
+                html += '<div class="txt"><span>Ajouter Menu</span><span>+5 CHF</span></div>';
+                html += '</div>';
+                
+                // FRITES (caché par défaut)
+                html += '<div class="frites-box" id="f-' + id + '">';
+                html += '<div style="font-weight:bold;margin-bottom:8px;">Frites:</div>';
+                html += '<div class="radio-group">';
+                html += '<div class="radio-btn" onclick="setFrites(\'' + id + '\', \'pomme\')" id="fp-' + id + '">🥔 Normales</div>';
+                html += '<div class="radio-btn" onclick="setFrites(\'' + id + '\', \'patate\')" id="ft-' + id + '">🍠 Douces</div>';
+                html += '</div>';
+                html += '</div>';
+                
+                // SUPPLÉMENTS
+                html += '<div class="section-title">➕ Suppléments</div>';
+                for (var s = 0; s < supplements.length; s++) {
+                    var sup = supplements[s];
+                    html += '<div class="check-line" onclick="toggleSupp(\'' + id + '\', \'' + sup.id + '\')">';
+                    html += '<input type="checkbox" id="s-' + id + '-' + sup.id + '" onclick="event.stopPropagation()">';
+                    html += '<div class="txt"><span>' + sup.n + '</span><span>+' + sup.p.toFixed(2) + ' CHF</span></div>';
+                    html += '</div>';
+                }
+                
+                // QUANTITÉ
+                html += '<div class="qty-control">';
+                html += '<button onclick="changeQty(\'' + id + '\', -1)" disabled id="min-' + id + '">-</button>';
+                html += '<span id="q-' + id + '">0</span>';
+                html += '<button onclick="changeQty(\'' + id + '\', 1)">+</button>';
+                html += '</div>';
+                
                 html += '</div>';
             }
             
+            document.getElementById('burgers').innerHTML = html;
+            
+            // Menus étudiants
+            var menusHtml = '<div style="background:#fff;border:2px solid #000;padding:10px;margin-bottom:15px;border-radius:8px;">🎓 Carte étudiante obligatoire</div>';
+            menusHtml += renderSimple('me0', 'Menu Étudiant M', 'Burger M + frites + soft', 14);
+            document.getElementById('menus').innerHTML = menusHtml;
+            
+            // Desserts
+            var dessertsHtml = '';
+            dessertsHtml += renderSimple('d0', 'Tiramisu Classique', 'Le classique italien', 6);
+            dessertsHtml += renderSimple('d1', 'Tiramisu Speculoos', 'Au goût de speculoos', 6);
+            dessertsHtml += renderSimple('d2', 'Tiramisu Oreo', 'Aux biscuits Oreo', 6);
+            document.getElementById('desserts').innerHTML = dessertsHtml;
+            
+            initDate();
+        }
+        
+        function renderSimple(id, name, desc, price) {
+            var html = '<div class="item">';
+            html += '<h3>' + name + '</h3>';
+            html += '<p>' + desc + '</p>';
+            html += '<div class="price">' + price.toFixed(2) + ' CHF</div>';
             html += '<div class="qty-control">';
-            html += '<button onclick="updateQty(\'' + id + '\', -1)" disabled id="btn-min-' + id + '">-</button>';
-            html += '<span id="qty-' + id + '">0</span>';
-            html += '<button onclick="updateQty(\'' + id + '\', 1)">+</button>';
-            html += '</div></div>';
+            html += '<button onclick="changeQty(\'' + id + '\', -1)" disabled id="min-' + id + '">-</button>';
+            html += '<span id="q-' + id + '">0</span>';
+            html += '<button onclick="changeQty(\'' + id + '\', 1)">+</button>';
+            html += '</div>';
+            html += '</div>';
             return html;
         }
         
-        function generateItemHtml(id, it) {
-            var html = '<div class="item">';
-            html += '<h3>' + it.n + '</h3>';
-            html += '<p>' + it.d + '</p>';
-            html += '<div class="price">' + it.p.toFixed(2) + ' CHF</div>';
-            html += '<div class="qty-control">';
-            html += '<button onclick="updateQty(\'' + id + '\', -1)" disabled id="btn-min-' + id + '">-</button>';
-            html += '<span id="qty-' + id + '">0</span>';
-            html += '<button onclick="updateQty(\'' + id + '\', 1)">+</button>';
-            html += '</div></div>';
-            return html;
-        }
-
-        function showCategory(catId, btn) {
+        // ACTIONS
+        function showCat(cat, btn) {
             document.querySelectorAll('.category').forEach(function(el) { el.classList.remove('active'); });
-            document.getElementById(catId).classList.add('active');
+            document.getElementById(cat).classList.add('active');
             document.querySelectorAll('.nav button').forEach(function(el) { el.classList.remove('active'); });
             btn.classList.add('active');
         }
-
-        // Gestion des clics après chargement du DOM
-        document.addEventListener('click', function(e) {
-            var target = e.target;
-            
-            // Gestion Menu
-            if (target.closest('.checkbox-row') && target.closest('.checkbox-row').id.startsWith('menu-row-')) {
-                var row = target.closest('.checkbox-row');
-                var id = row.id.replace('menu-row-', '');
-                var cb = document.getElementById(id + '-menu');
-                cb.checked = !cb.checked;
-                updateMenuState(id);
-            }
-            
-            // Gestion Suppléments
-            if (target.closest('.checkbox-row') && target.closest('.checkbox-row').id.startsWith('supp-row-')) {
-                var row = target.closest('.checkbox-row');
-                var parts = row.id.replace('supp-row-', '').split('-');
-                var itemId = parts[0] + '-' + parts[1];
-                var supId = parts[2];
-                var cb = document.getElementById(itemId + '-' + supId);
-                cb.checked = !cb.checked;
-                updateSupplementState(itemId, supId);
-            }
-            
-            // Gestion Frites
-            if (target.classList.contains('radio-box')) {
-                var parts = target.id.replace('frites-', '').split('-');
-                var type = parts[0];
-                var itemId = parts[1] + '-' + parts[2];
-                selectFrites(itemId, type);
-            }
-        });
-
-        function updateMenuState(itemId) {
-            var cb = document.getElementById(itemId + '-menu');
-            var fritesBox = document.getElementById('frites-box-' + itemId);
-            var menuRow = document.getElementById('menu-row-' + itemId);
-            
-            if (!cartMenuOption[itemId]) cartMenuOption[itemId] = {menu: false, frites: null};
-            
-            if (cb.checked) {
-                cartMenuOption[itemId].menu = true;
-                fritesBox.classList.add('show');
-                menuRow.classList.add('selected');
-            } else {
-                cartMenuOption[itemId] = {menu: false, frites: null};
-                fritesBox.classList.remove('show');
-                menuRow.classList.remove('selected');
-                document.getElementById('frites-pomme-' + itemId).classList.remove('selected');
-                document.getElementById('frites-patate-' + itemId).classList.remove('selected');
-            }
-            updateCartDisplay();
+        
+        function toggleMenu(id) {
+            var cb = document.getElementById('m-' + id);
+            cb.checked = !cb.checked;
+            updateMenu(id);
         }
         
-        function selectFrites(itemId, type) {
-            if (!cartMenuOption[itemId] || !cartMenuOption[itemId].menu) return;
-            cartMenuOption[itemId].frites = type;
-            document.getElementById('frites-pomme-' + itemId).classList.remove('selected');
-            document.getElementById('frites-patate-' + itemId).classList.remove('selected');
-            document.getElementById('frites-' + type + '-' + itemId).classList.add('selected');
-            updateCartDisplay();
-        }
-
-        function updateSupplementState(itemId, supId) {
-            var cb = document.getElementById(itemId + '-' + supId);
-            var row = document.getElementById('supp-row-' + itemId + '-' + supId);
+        function updateMenu(id) {
+            var cb = document.getElementById('m-' + id);
+            var line = cb.parentElement;
+            var frites = document.getElementById('f-' + id);
             
-            if (!cartSupplements[itemId]) cartSupplements[itemId] = [];
+            if (!opts[id]) opts[id] = {menu: false, frites: null, supps: []};
             
             if (cb.checked) {
-                if (cartSupplements[itemId].indexOf(supId) === -1) cartSupplements[itemId].push(supId);
-                row.classList.add('selected');
+                opts[id].menu = true;
+                line.classList.add('checked');
+                frites.classList.add('show');
             } else {
-                cartSupplements[itemId] = cartSupplements[itemId].filter(function(id) { return id !== supId; });
-                row.classList.remove('selected');
+                opts[id] = {menu: false, frites: null, supps: []};
+                line.classList.remove('checked');
+                frites.classList.remove('show');
+                document.getElementById('fp-' + id).classList.remove('selected');
+                document.getElementById('ft-' + id).classList.remove('selected');
             }
-            updateCartDisplay();
+            updateTotal();
         }
-
-        function updateQty(id, change) {
+        
+        function setFrites(id, type) {
+            if (!opts[id] || !opts[id].menu) return;
+            opts[id].frites = type;
+            document.getElementById('fp-' + id).classList.remove('selected');
+            document.getElementById('ft-' + id).classList.remove('selected');
+            document.getElementById('f' + type[0] + '-' + id).classList.add('selected');
+            updateTotal();
+        }
+        
+        function toggleSupp(id, supId) {
+            var cb = document.getElementById('s-' + id + '-' + supId);
+            cb.checked = !cb.checked;
+            updateSupp(id, supId);
+        }
+        
+        function updateSupp(id, supId) {
+            var cb = document.getElementById('s-' + id + '-' + supId);
+            var line = cb.parentElement;
+            
+            if (!opts[id]) opts[id] = {menu: false, frites: null, supps: []};
+            
+            if (cb.checked) {
+                if (opts[id].supps.indexOf(supId) === -1) opts[id].supps.push(supId);
+                line.classList.add('checked');
+            } else {
+                opts[id].supps = opts[id].supps.filter(function(s) { return s !== supId; });
+                line.classList.remove('checked');
+            }
+            updateTotal();
+        }
+        
+        function changeQty(id, delta) {
             if (!cart[id]) cart[id] = 0;
-            cart[id] += change;
+            cart[id] += delta;
             if (cart[id] < 0) cart[id] = 0;
             if (cart[id] > 10) cart[id] = 10;
             
-            document.getElementById('qty-' + id).textContent = cart[id];
-            document.getElementById('btn-min-' + id).disabled = (cart[id] <= 0);
+            document.getElementById('q-' + id).textContent = cart[id];
+            document.getElementById('min-' + id).disabled = (cart[id] === 0);
             
-            if (cart[id] === 0) {
-                cartSupplements[id] = [];
-                cartMenuOption[id] = {menu: false, frites: null};
-                document.querySelectorAll('[id^="' + id + '-"]').forEach(function(el) {
-                    if (el.type === 'checkbox') {
-                        el.checked = false;
-                        var row = el.closest('.checkbox-row');
-                        if (row) row.classList.remove('selected');
-                    }
-                });
-                var fritesBox = document.getElementById('frites-box-' + id);
-                if (fritesBox) {
-                    fritesBox.classList.remove('show');
-                    document.getElementById('frites-pomme-' + id).classList.remove('selected');
-                    document.getElementById('frites-patate-' + id).classList.remove('selected');
+            // Reset si quantité 0
+            if (cart[id] === 0 && id.startsWith('b')) {
+                var idx = id.substring(1);
+                // Reset menu
+                var mcb = document.getElementById('m-' + id);
+                if (mcb && mcb.checked) {
+                    mcb.checked = false;
+                    mcb.parentElement.classList.remove('checked');
+                    document.getElementById('f-' + id).classList.remove('show');
+                    document.getElementById('fp-' + id).classList.remove('selected');
+                    document.getElementById('ft-' + id).classList.remove('selected');
                 }
+                // Reset supps
+                for (var i = 0; i < supplements.length; i++) {
+                    var scb = document.getElementById('s-' + id + '-' + supplements[i].id);
+                    if (scb && scb.checked) {
+                        scb.checked = false;
+                        scb.parentElement.classList.remove('checked');
+                    }
+                }
+                opts[id] = {menu: false, frites: null, supps: []};
             }
             
-            updateCartDisplay();
+            updateTotal();
         }
-
-        function updateCartDisplay() {
+        
+        function updateTotal() {
             var total = 0, count = 0;
             for (var id in cart) {
                 if (cart[id] > 0) {
-                    var parts = id.split('-');
-                    var item = menuData[parts[0]][parseInt(parts[1])];
-                    var itemTotal = item.p * cart[id];
+                    var price = 0;
+                    if (id.startsWith('b')) price = burgers[parseInt(id.substring(1))].p;
+                    else if (id.startsWith('me')) price = 14;
+                    else if (id.startsWith('d')) price = 6;
                     
-                    if (cartMenuOption[id] && cartMenuOption[id].menu) itemTotal += 5.00 * cart[id];
+                    var itemTotal = price * cart[id];
                     
-                    if (cartSupplements[id]) {
-                        for (var i = 0; i < cartSupplements[id].length; i++) {
-                            var sup = supplements.find(function(s) { return s.id === cartSupplements[id][i]; });
+                    if (opts[id]) {
+                        if (opts[id].menu) itemTotal += 5 * cart[id];
+                        for (var i = 0; i < opts[id].supps.length; i++) {
+                            var sup = supplements.find(function(s) { return s.id === opts[id].supps[i]; });
                             if (sup) itemTotal += sup.p * cart[id];
                         }
                     }
@@ -347,166 +353,149 @@
             document.getElementById('cart-count').textContent = count + (count > 1 ? ' articles' : ' article');
             document.getElementById('order-btn').disabled = (count === 0);
         }
-
+        
         function initDate() {
             var today = new Date();
-            var str = today.toISOString().split('T')[0];
-            document.getElementById('delivery-date').min = str;
-            document.getElementById('delivery-date').value = str;
+            document.getElementById('delivery-date').valueAsDate = today;
             updateTimes();
         }
-
+        
         function updateTimes() {
-            var dateInput = document.getElementById('delivery-date').value;
-            var timeSelect = document.getElementById('delivery-time');
-            timeSelect.innerHTML = '<option value="">Choisir l\'heure</option>';
-            if (!dateInput) return;
+            var date = document.getElementById('delivery-date').value;
+            var sel = document.getElementById('delivery-time');
+            sel.innerHTML = '<option value="">Choisir</option>';
+            if (!date) return;
             
-            var selectedDate = new Date(dateInput);
+            var d = new Date(date);
             var now = new Date();
-            var isToday = selectedDate.toDateString() === now.toDateString();
+            var isToday = d.toDateString() === now.toDateString();
             
-            var slots = [];
-            for (var h = 11; h <= 14; h++) {
-                for (var m = 0; m < 60; m += 15) {
-                    if (h === 11 && m < 30) continue;
-                    if (h === 14 && m > 0) break;
-                    slots.push({h: h, m: m});
-                }
-            }
+            var slots = ['11:30', '11:45', '12:00', '12:15', '12:30', '12:45', '13:00', '13:15', '13:30', '13:45', '14:00'];
             
             if (isToday) {
                 var minTime = new Date(now.getTime() + 45 * 60000);
-                slots = slots.filter(function(slot) {
-                    var slotTime = new Date();
-                    slotTime.setHours(slot.h, slot.m, 0, 0);
-                    return slotTime >= minTime;
+                var minHour = minTime.getHours();
+                var minMin = minTime.getMinutes();
+                slots = slots.filter(function(t) {
+                    var parts = t.split(':');
+                    var h = parseInt(parts[0]);
+                    var m = parseInt(parts[1]);
+                    return h > minHour || (h === minHour && m >= minMin);
                 });
             }
             
-            slots.forEach(function(slot) {
-                var timeStr = String(slot.h).padStart(2, '0') + ':' + String(slot.m).padStart(2, '0');
+            slots.forEach(function(t) {
                 var opt = document.createElement('option');
-                opt.value = timeStr;
-                opt.textContent = timeStr;
-                timeSelect.appendChild(opt);
+                opt.value = t;
+                opt.textContent = t;
+                sel.appendChild(opt);
             });
         }
-
+        
         function openOrder() {
             updateTimes();
-            var list = document.getElementById('order-list');
             var html = '';
             var total = 0;
             
             for (var id in cart) {
                 if (cart[id] > 0) {
-                    var parts = id.split('-');
-                    var it = menuData[parts[0]][parseInt(parts[1])];
-                    var itemTotal = it.p * cart[id];
+                    var name, price;
+                    if (id.startsWith('b')) { name = burgers[parseInt(id.substring(1))].n; price = burgers[parseInt(id.substring(1))].p; }
+                    else if (id.startsWith('me')) { name = 'Menu Étudiant M'; price = 14; }
+                    else if (id.startsWith('d')) { name = ['Tiramisu Classique', 'Tiramisu Speculoos', 'Tiramisu Oreo'][parseInt(id.substring(1))]; price = 6; }
+                    
+                    var itemTotal = price * cart[id];
                     var details = [];
                     
-                    if (cartMenuOption[id] && cartMenuOption[id].menu) {
-                        itemTotal += 5.00 * cart[id];
-                        var fritesType = cartMenuOption[id].frites === 'patate' ? 'patates douces' : 'pommes de terre';
-                        details.push('Menu avec frites ' + fritesType);
+                    if (opts[id] && opts[id].menu) {
+                        itemTotal += 5 * cart[id];
+                        details.push('Menu + frites ' + (opts[id].frites === 'patate' ? 'douces' : 'normales'));
                     }
-                    
-                    if (cartSupplements[id] && cartSupplements[id].length > 0) {
-                        var supps = cartSupplements[id].map(function(sid) {
+                    if (opts[id] && opts[id].supps.length > 0) {
+                        var snames = opts[id].supps.map(function(sid) {
                             var s = supplements.find(function(x) { return x.id === sid; });
                             return s ? s.n : '';
-                        }).filter(function(x) { return x; });
-                        details.push('Suppléments: ' + supps.join(', '));
+                        });
+                        details.push('+' + snames.join(', '));
+                        itemTotal += opts[id].supps.length * 2.5 * cart[id];
                     }
                     
                     total += itemTotal;
-                    html += '<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #ddd;">';
-                    html += '<span>' + cart[id] + '× ' + it.n + (details.length ? '<br><small>' + details.join('<br>') + '</small>' : '') + '</span>';
-                    html += '<span>' + itemTotal.toFixed(2) + ' CHF</span></div>';
+                    html += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ddd;">';
+                    html += '<div>' + cart[id] + '× ' + name + (details.length ? '<br><small>' + details.join(' | ') + '</small>' : '') + '</div>';
+                    html += '<div>' + itemTotal.toFixed(2) + ' CHF</div>';
+                    html += '</div>';
                 }
             }
             
-            html += '<div style="font-weight:bold;font-size:18px;margin-top:10px;padding-top:10px;border-top:2px solid #000;display:flex;justify-content:space-between;">';
+            html += '<div style="display:flex;justify-content:space-between;padding:15px 0;margin-top:10px;border-top:2px solid #000;font-weight:bold;font-size:18px;">';
             html += '<span>TOTAL</span><span>' + total.toFixed(2) + ' CHF</span></div>';
-            list.innerHTML = html;
+            
+            document.getElementById('order-list').innerHTML = html;
             document.getElementById('orderModal').classList.add('show');
         }
-
+        
         function closeOrder() {
             document.getElementById('orderModal').classList.remove('show');
         }
-
+        
         function sendOrder() {
             var name = document.getElementById('name').value.trim();
             var phone = document.getElementById('phone').value.trim();
             var date = document.getElementById('delivery-date').value;
             var time = document.getElementById('delivery-time').value;
-
+            var notes = document.getElementById('notes').value.trim();
+            
             if (!name || !phone) { alert('Veuillez remplir le nom et téléphone'); return; }
-                        if (!date || !time) { alert('Veuillez choisir la date et l\'heure'); return; }
-
-            var msg = '🍔 *COMMANDE CAFE BAR LE 31*%0A%0A';
-            msg += '👤 *Client:* ' + encodeURIComponent(name) + '%0A';
-            msg += '📞 *Téléphone:* ' + encodeURIComponent(phone) + '%0A';
-            msg += '📅 *Retrait:* ' + date + ' à ' + time + '%0A';
-            msg += '📍 *Adresse:* Avenue de la Gare 31, 2800 Delémont%0A%0A';
-            msg += '*Commande:*%0A';
-
+            if (!date || !time) { alert('Veuillez choisir la date et l\'heure'); return; }
+            
+            var msg = '🍔 *COMMANDE CAFE BAR LE 31*\n\n';
+            msg += '👤 ' + name + '\n';
+            msg += '📞 ' + phone + '\n';
+            msg += '📅 ' + date + ' à ' + time + '\n';
+            msg += '📍 Avenue de la Gare 31, 2800 Delémont\n\n';
+            msg += '*Commande:*\n';
+            
             var total = 0;
             for (var id in cart) {
                 if (cart[id] > 0) {
-                    var parts = id.split('-');
-                    var it = menuData[parts[0]][parseInt(parts[1])];
-                    var itemTotal = it.p * cart[id];
+                    var itemName, basePrice;
+                    if (id.startsWith('b')) { itemName = burgers[parseInt(id.substring(1))].n; basePrice = burgers[parseInt(id.substring(1))].p; }
+                    else if (id.startsWith('me')) { itemName = 'Menu Étudiant M'; basePrice = 14; }
+                    else { itemName = 'Tiramisu'; basePrice = 6; }
                     
-                    msg += '• ' + cart[id] + '× ' + it.n;
+                    var lineTotal = basePrice * cart[id];
+                    msg += cart[id] + '× ' + itemName;
                     
-                    if (cartMenuOption[id] && cartMenuOption[id].menu) {
-                        itemTotal += 5.00 * cart[id];
-                        var fritesType = cartMenuOption[id].frites === 'patate' ? 'patates douces' : 'pommes de terre';
-                        msg += ' + Menu (frites ' + fritesType + ')';
+                    if (opts[id] && opts[id].menu) {
+                        lineTotal += 5 * cart[id];
+                        msg += ' +Menu(' + (opts[id].frites === 'patate' ? 'douces' : 'normales') + ')';
+                    }
+                    if (opts[id] && opts[id].supps.length > 0) {
+                        msg += ' +' + opts[id].supps.join(',');
+                        lineTotal += opts[id].supps.length * 2.5 * cart[id];
                     }
                     
-                    if (cartSupplements[id] && cartSupplements[id].length > 0) {
-                        msg += ' avec ';
-                        msg += cartSupplements[id].map(function(sid) {
-                            var s = supplements.find(function(x) { return x.id === sid; });
-                            return s ? s.n : '';
-                        }).filter(function(x) { return x; }).join(', ');
-                    }
-                    
-                    msg += ' - ' + itemTotal.toFixed(2) + ' CHF%0A';
-                    total += itemTotal;
+                    msg += ' = ' + lineTotal.toFixed(2) + ' CHF\n';
+                    total += lineTotal;
                 }
             }
             
-            msg += '%0A💰 *TOTAL: ' + total.toFixed(2) + ' CHF*';
-            var notes = document.getElementById('notes').value.trim();
-            if (notes) msg += '%0A%0A📝 *Commentaires:* ' + encodeURIComponent(notes);
-
-            window.open('https://wa.me/41783280311?text=' + msg, '_blank');
+            msg += '\n💰 *TOTAL: ' + total.toFixed(2) + ' CHF*';
+            if (notes) msg += '\n\n📝 ' + notes;
+            
+            window.open('https://wa.me/41783280311?text=' + encodeURIComponent(msg), '_blank');
             
             // Reset
-            cart = {}; cartSupplements = {}; cartMenuOption = {};
-            document.querySelectorAll('.qty-control span').forEach(function(el) { el.textContent = '0'; });
-            document.querySelectorAll('.qty-control button').forEach(function(el) { if (el.textContent === '-') el.disabled = true; });
-            document.querySelectorAll('input[type="checkbox"]').forEach(function(el) { 
-                el.checked = false; 
-                var row = el.closest('.checkbox-row');
-                if (row) row.classList.remove('selected');
-            });
-            document.querySelectorAll('.frites-box').forEach(function(el) { el.classList.remove('show'); });
-            document.querySelectorAll('.radio-box').forEach(function(el) { el.classList.remove('selected'); });
-            
-            updateCartDisplay();
-            closeOrder();
+            cart = {};
+            opts = {};
+            init();
             document.getElementById('name').value = '';
             document.getElementById('phone').value = '';
             document.getElementById('notes').value = '';
-            initDate();
+            closeOrder();
         }
-
+        
         init();
     </script>
 </body>
