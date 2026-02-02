@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Le 31 - Smash Burgers</title>
+    <title>Café Bar le 31 - Smash Burgers</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #fff; padding-bottom: 100px; }
@@ -158,7 +158,17 @@
                 html += '<p>' + b.d + '</p>';
                 html += '<div class="price">' + b.p.toFixed(2) + ' CHF</div>';
                 
-                // MENU
+                // SUPPLÉMENTS (maintenant en premier)
+                html += '<div class="section-title">➕ Suppléments</div>';
+                for (var s = 0; s < supplements.length; s++) {
+                    var sup = supplements[s];
+                    html += '<div class="check-line" onclick="toggleSupp(\'' + id + '\', \'' + sup.id + '\')">';
+                    html += '<input type="checkbox" id="s-' + id + '-' + sup.id + '" onclick="event.stopPropagation()">';
+                    html += '<div class="txt"><span>' + sup.n + '</span><span>+' + sup.p.toFixed(2) + ' CHF</span></div>';
+                    html += '</div>';
+                }
+                
+                // MENU (maintenant après les suppléments)
                 html += '<div class="section-title">🍟 Menu (+5 CHF)</div>';
                 html += '<div class="check-line" onclick="toggleMenu(\'' + id + '\')">';
                 html += '<input type="checkbox" id="m-' + id + '" onclick="event.stopPropagation()">';
@@ -174,16 +184,6 @@
                 html += '</div>';
                 html += '</div>';
                 
-                // SUPPLÉMENTS
-                html += '<div class="section-title">➕ Suppléments</div>';
-                for (var s = 0; s < supplements.length; s++) {
-                    var sup = supplements[s];
-                    html += '<div class="check-line" onclick="toggleSupp(\'' + id + '\', \'' + sup.id + '\')">';
-                    html += '<input type="checkbox" id="s-' + id + '-' + sup.id + '" onclick="event.stopPropagation()">';
-                    html += '<div class="txt"><span>' + sup.n + '</span><span>+' + sup.p.toFixed(2) + ' CHF</span></div>';
-                    html += '</div>';
-                }
-                
                 // QUANTITÉ
                 html += '<div class="qty-control">';
                 html += '<button onclick="changeQty(\'' + id + '\', -1)" disabled id="min-' + id + '">-</button>';
@@ -196,9 +196,10 @@
             
             document.getElementById('burgers').innerHTML = html;
             
-            // Menus étudiants
-            var menusHtml = '<div style="background:#fff;border:2px solid #000;padding:10px;margin-bottom:15px;border-radius:8px;">🎓 Carte étudiante obligatoire</div>';
-            menusHtml += renderSimple('me0', 'Menu Étudiant M', 'Burger M + frites + soft', 14);
+            // Menus étudiants (maintenant avec 2 choix)
+            var menusHtml = '<div style="background:#fff;border:2px solid #000;padding:10px;margin-bottom:15px;border-radius:8px;">🎓 Sur présentation de votre carte étudiante uniquement</div>';
+            menusHtml += renderSimple('me0', 'Menu Étudiant M', 'Burger M + frites + soft 3dl', 14);
+            menusHtml += renderSimple('me1', 'Menu Étudiant L', 'Burger L + frites + soft 3dl', 16);
             document.getElementById('menus').innerHTML = menusHtml;
             
             // Desserts
@@ -251,7 +252,8 @@
                 line.classList.add('checked');
                 frites.classList.add('show');
             } else {
-                opts[id] = {menu: false, frites: null, supps: []};
+                opts[id].menu = false;
+                opts[id].frites = null;
                 line.classList.remove('checked');
                 frites.classList.remove('show');
                 document.getElementById('fp-' + id).classList.remove('selected');
@@ -332,7 +334,7 @@
                 if (cart[id] > 0) {
                     var price = 0;
                     if (id.startsWith('b')) price = burgers[parseInt(id.substring(1))].p;
-                    else if (id.startsWith('me')) price = 14;
+                    else if (id.startsWith('me')) price = (id === 'me0') ? 14 : 16;
                     else if (id.startsWith('d')) price = 6;
                     
                     var itemTotal = price * cart[id];
@@ -401,7 +403,10 @@
                 if (cart[id] > 0) {
                     var name, price;
                     if (id.startsWith('b')) { name = burgers[parseInt(id.substring(1))].n; price = burgers[parseInt(id.substring(1))].p; }
-                    else if (id.startsWith('me')) { name = 'Menu Étudiant M'; price = 14; }
+                    else if (id.startsWith('me')) { 
+                        if (id === 'me0') { name = 'Menu Étudiant M'; price = 14; }
+                        else { name = 'Menu Étudiant L'; price = 16; }
+                    }
                     else if (id.startsWith('d')) { name = ['Tiramisu Classique', 'Tiramisu Speculoos', 'Tiramisu Oreo'][parseInt(id.substring(1))]; price = 6; }
                     
                     var itemTotal = price * cart[id];
@@ -449,7 +454,7 @@
             if (!name || !phone) { alert('Veuillez remplir le nom et téléphone'); return; }
             if (!date || !time) { alert('Veuillez choisir la date et l\'heure'); return; }
             
-            var msg = '🍔 *COMMANDE LE 31*\n\n';
+            var msg = '🍔 *COMMANDE CAFE BAR LE 31*\n\n';
             msg += '👤 ' + name + '\n';
             msg += '📞 ' + phone + '\n';
             msg += '📅 ' + date + ' à ' + time + '\n';
@@ -461,7 +466,10 @@
                 if (cart[id] > 0) {
                     var itemName, basePrice;
                     if (id.startsWith('b')) { itemName = burgers[parseInt(id.substring(1))].n; basePrice = burgers[parseInt(id.substring(1))].p; }
-                    else if (id.startsWith('me')) { itemName = 'Menu Étudiant M'; basePrice = 14; }
+                    else if (id.startsWith('me')) { 
+                        if (id === 'me0') { itemName = 'Menu Étudiant M'; basePrice = 14; }
+                        else { itemName = 'Menu Étudiant L'; basePrice = 16; }
+                    }
                     else { itemName = 'Tiramisu'; basePrice = 6; }
                     
                     var lineTotal = basePrice * cart[id];
