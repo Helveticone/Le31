@@ -9,7 +9,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #ffffff; padding-bottom: 100px; min-height: 100%; color: #000000; touch-action: manipulation; }
         .header { background: #000000; color: #ffffff; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; border-bottom: 3px solid #000000; }
-        .header img { width: 120px; height: 120px; background: #ffffff; border-radius: 50%; margin-bottom: 10px; padding: 5px; border: 3px solid #ffffff; object-fit: contain; }
+        .header img { width: 120px; height: 120px; background: #ffffff; border-radius: 50%; margin-bottom: 10px; padding: 5px; border: 3px solid #ffffff; object-fit: contain; display: block; margin-left: auto; margin-right: auto; }
         .nav { display: flex; overflow-x: auto; gap: 10px; padding: 15px; background: #ffffff; position: sticky; top: 180px; z-index: 99; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-bottom: 2px solid #000000; }
         .nav button { flex-shrink: 0; padding: 12px 20px; border: 2px solid #000000; background: #ffffff; color: #000000; border-radius: 25px; font-weight: bold; font-size: 14px; cursor: pointer; }
         .nav button.active { background: #000000; color: #ffffff; }
@@ -29,12 +29,12 @@
         #orderModal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: flex-end; justify-content: center; }
         #orderModal.show { display: flex; }
         .modal-content { background: #ffffff; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; border-radius: 20px 20px 0 0; padding: 25px; border-top: 3px solid #000000; }
-        .checkbox-row { display: flex; align-items: center; padding: 12px; border: 2px solid #000000; border-radius: 10px; margin: 8px 0; cursor: pointer; background: #ffffff; }
+        .checkbox-row { display: flex; align-items: center; padding: 12px; border: 2px solid #000000; border-radius: 10px; margin: 8px 0; cursor: pointer; background: #ffffff; -webkit-tap-highlight-color: rgba(0,0,0,0.1); }
         .checkbox-row.selected { background: #000000; color: #ffffff; }
-        .checkbox-row input[type="checkbox"] { width: 20px; height: 20px; margin-right: 10px; cursor: pointer; }
-        .checkbox-row .text { flex: 1; display: flex; justify-content: space-between; }
+        .checkbox-row input[type="checkbox"] { width: 20px; height: 20px; margin-right: 10px; pointer-events: none; }
+        .checkbox-row .text { flex: 1; display: flex; justify-content: space-between; pointer-events: none; }
         .radio-group { display: flex; gap: 10px; margin: 10px 0; }
-        .radio-box { flex: 1; padding: 12px; border: 2px solid #000000; border-radius: 10px; text-align: center; cursor: pointer; }
+        .radio-box { flex: 1; padding: 12px; border: 2px solid #000000; border-radius: 10px; text-align: center; cursor: pointer; -webkit-tap-highlight-color: rgba(0,0,0,0.1); }
         .radio-box.selected { background: #000000; color: #ffffff; }
         .frites-box { display: none; margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 8px; border: 1px solid #000000; }
         .frites-box.show { display: block; }
@@ -42,13 +42,18 @@
         .btn-primary { width: 100%; background: #000000; color: #ffffff; border: 2px solid #000000; padding: 16px; border-radius: 25px; font-size: 16px; font-weight: bold; margin-top: 10px; cursor: pointer; }
         input, textarea, select { width: 100%; padding: 12px; border: 2px solid #000000; border-radius: 10px; font-size: 15px; margin: 5px 0; }
         .form-group { margin-bottom: 15px; }
+        .badge { display: inline-block; background: #ffffff; color: #000000; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: bold; margin: 2px; border: 2px solid #000000; }
     </style>
 </head>
 <body>
     <div class="header">
-        <img src="logo-officiel.png" alt="Logo Café Bar le 31">
+        <img src="./logo-officiel.png" alt="Logo Café Bar le 31" id="logo-img">
         <h1>Café Bar le 31</h1>
         <p>Smash Burgers • À emporter uniquement</p>
+        <div style="margin-top: 10px;">
+            <span class="badge">🍔 Smash Burgers</span>
+            <span class="badge">📍 Avenue de la Gare 31</span>
+        </div>
     </div>
 
     <div class="nav">
@@ -124,6 +129,12 @@
         var cart = {}, cartSupplements = {}, cartMenuOption = {};
 
         function init() {
+            // Vérifier si le logo existe
+            var img = new Image();
+            img.onload = function() { document.getElementById('logo-img').src = './logo-officiel.png'; };
+            img.onerror = function() { document.getElementById('logo-img').style.display = 'none'; };
+            img.src = './logo-officiel.png';
+
             var burgersHtml = '<div style="background:#fff;border:2px solid #000;padding:12px;margin-bottom:15px;border-radius:8px;">🥩 Chaque burger inclut: cheddar, oignons caramélisés, sauce maison</div>';
             for (var i = 0; i < menuData.burgers.length; i++) {
                 burgersHtml += generateBurgerHtml('burgers-' + i, menuData.burgers[i]);
@@ -152,24 +163,24 @@
             html += '<div class="price">' + it.p.toFixed(2) + ' CHF</div>';
             
             html += '<div class="section-title">🍟 Menu (+5 CHF)</div>';
-            html += '<div class="checkbox-row" onclick="toggleMenu(\'' + id + '\')" id="menu-row-' + id + '">';
-            html += '<input type="checkbox" id="' + id + '-menu" onclick="event.stopPropagation()">';
+            html += '<div class="checkbox-row" id="menu-row-' + id + '">';
+            html += '<input type="checkbox" id="' + id + '-menu">';
             html += '<div class="text"><span>Ajouter Menu (+5 CHF)</span><span>Inclut frites + soft</span></div>';
             html += '</div>';
             
             html += '<div class="frites-box" id="frites-box-' + id + '">';
             html += '<div style="font-weight:bold;margin-bottom:8px;">Choix des frites:</div>';
             html += '<div class="radio-group">';
-            html += '<div class="radio-box" onclick="selectFrites(\'' + id + '\', \'pomme\')" id="frites-pomme-' + id + '">🥔 Pommes de terre</div>';
-            html += '<div class="radio-box" onclick="selectFrites(\'' + id + '\', \'patate\')" id="frites-patate-' + id + '">🍠 Patates douces</div>';
+            html += '<div class="radio-box" id="frites-pomme-' + id + '">🥔 Pommes de terre</div>';
+            html += '<div class="radio-box" id="frites-patate-' + id + '">🍠 Patates douces</div>';
             html += '</div>';
             html += '</div>';
             
             html += '<div class="section-title">➕ Suppléments</div>';
             for (var s = 0; s < supplements.length; s++) {
                 var sup = supplements[s];
-                html += '<div class="checkbox-row" onclick="toggleSupplement(\'' + id + '\', \'' + sup.id + '\')" id="supp-row-' + id + '-' + sup.id + '">';
-                html += '<input type="checkbox" id="' + id + '-' + sup.id + '" onclick="event.stopPropagation()">';
+                html += '<div class="checkbox-row" id="supp-row-' + id + '-' + sup.id + '">';
+                html += '<input type="checkbox" id="' + id + '-' + sup.id + '">';
                 html += '<div class="text"><span>' + sup.n + '</span><span>+' + sup.p.toFixed(2) + ' CHF</span></div>';
                 html += '</div>';
             }
@@ -202,11 +213,38 @@
             btn.classList.add('active');
         }
 
-        function toggleMenu(itemId) {
-            var cb = document.getElementById(itemId + '-menu');
-            cb.checked = !cb.checked;
-            updateMenuState(itemId);
-        }
+        // Gestion des clics après chargement du DOM
+        document.addEventListener('click', function(e) {
+            var target = e.target;
+            
+            // Gestion Menu
+            if (target.closest('.checkbox-row') && target.closest('.checkbox-row').id.startsWith('menu-row-')) {
+                var row = target.closest('.checkbox-row');
+                var id = row.id.replace('menu-row-', '');
+                var cb = document.getElementById(id + '-menu');
+                cb.checked = !cb.checked;
+                updateMenuState(id);
+            }
+            
+            // Gestion Suppléments
+            if (target.closest('.checkbox-row') && target.closest('.checkbox-row').id.startsWith('supp-row-')) {
+                var row = target.closest('.checkbox-row');
+                var parts = row.id.replace('supp-row-', '').split('-');
+                var itemId = parts[0] + '-' + parts[1];
+                var supId = parts[2];
+                var cb = document.getElementById(itemId + '-' + supId);
+                cb.checked = !cb.checked;
+                updateSupplementState(itemId, supId);
+            }
+            
+            // Gestion Frites
+            if (target.classList.contains('radio-box')) {
+                var parts = target.id.replace('frites-', '').split('-');
+                var type = parts[0];
+                var itemId = parts[1] + '-' + parts[2];
+                selectFrites(itemId, type);
+            }
+        });
 
         function updateMenuState(itemId) {
             var cb = document.getElementById(itemId + '-menu');
@@ -236,12 +274,6 @@
             document.getElementById('frites-patate-' + itemId).classList.remove('selected');
             document.getElementById('frites-' + type + '-' + itemId).classList.add('selected');
             updateCartDisplay();
-        }
-
-        function toggleSupplement(itemId, supId) {
-            var cb = document.getElementById(itemId + '-' + supId);
-            cb.checked = !cb.checked;
-            updateSupplementState(itemId, supId);
         }
 
         function updateSupplementState(itemId, supId) {
@@ -275,8 +307,8 @@
                 document.querySelectorAll('[id^="' + id + '-"]').forEach(function(el) {
                     if (el.type === 'checkbox') {
                         el.checked = false;
-                        var row = el.parentElement;
-                        if (row && row.classList.contains('checkbox-row')) row.classList.remove('selected');
+                        var row = el.closest('.checkbox-row');
+                        if (row) row.classList.remove('selected');
                     }
                 });
                 var fritesBox = document.getElementById('frites-box-' + id);
@@ -412,7 +444,7 @@
             var time = document.getElementById('delivery-time').value;
 
             if (!name || !phone) { alert('Veuillez remplir le nom et téléphone'); return; }
-            if (!date || !time) { alert('Veuillez choisir la date et l\'heure'); return; }
+                        if (!date || !time) { alert('Veuillez choisir la date et l\'heure'); return; }
 
             var msg = '🍔 *COMMANDE CAFE BAR LE 31*%0A%0A';
             msg += '👤 *Client:* ' + encodeURIComponent(name) + '%0A';
@@ -461,8 +493,8 @@
             document.querySelectorAll('.qty-control button').forEach(function(el) { if (el.textContent === '-') el.disabled = true; });
             document.querySelectorAll('input[type="checkbox"]').forEach(function(el) { 
                 el.checked = false; 
-                var row = el.parentElement;
-                if (row && row.classList.contains('checkbox-row')) row.classList.remove('selected');
+                var row = el.closest('.checkbox-row');
+                if (row) row.classList.remove('selected');
             });
             document.querySelectorAll('.frites-box').forEach(function(el) { el.classList.remove('show'); });
             document.querySelectorAll('.radio-box').forEach(function(el) { el.classList.remove('selected'); });
